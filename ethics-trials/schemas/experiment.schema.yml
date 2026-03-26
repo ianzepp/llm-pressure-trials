@@ -1,0 +1,139 @@
+# Experiment schema for ethics-trials
+#
+# This file describes the expected shape of experiment definition files.
+# It is a project contract, not an executable experiment instance.
+
+kind: schema
+name: experiment
+version: 1
+
+description: >
+  Defines the structure of an experiment. An experiment specifies how one or
+  more scenarios or conditions are sequenced, repeated, and compared.
+
+required:
+  - id
+  - title
+  - mode
+  - units
+
+fields:
+  id:
+    type: string
+    description: Stable experiment identifier.
+    example: abab/authority-mercy-sweep
+
+  title:
+    type: string
+    description: Human-readable experiment title.
+
+  description:
+    type: string
+    required: false
+    description: Short explanation of the experimental design.
+
+  mode:
+    type: string
+    allowed:
+      - single
+      - ab
+      - abab
+      - sweep
+      - repeated
+    description: Top-level experiment structure.
+
+  tags:
+    type: list[string]
+    required: false
+    description: Search and grouping tags.
+
+  units:
+    type: list[object]
+    description: >
+      Ordered execution units. Each unit references a scenario and optionally a
+      condition label, variant, or output format.
+    item_fields:
+      label:
+        type: string
+        description: Sequence label such as A1, B1, A2, B2.
+      scenario:
+        type: string
+        description: Scenario id reference.
+      condition:
+        type: string
+        required: false
+        description: Scenario-defined condition id reference.
+      variant:
+        type: string
+        required: false
+        description: Scenario-defined variant id reference.
+      output_format:
+        type: string
+        required: false
+      repeat:
+        type: integer
+        required: false
+        description: Optional repetition count for this unit.
+
+  model_selection:
+    type: object
+    required: false
+    description: Optional default model selection hints.
+    fields:
+      include:
+        type: list[string]
+        required: false
+      exclude:
+        type: list[string]
+        required: false
+      model_set:
+        type: string
+        required: false
+
+  ordering:
+    type: object
+    required: false
+    description: Optional sequencing rules.
+    fields:
+      randomized:
+        type: boolean
+        required: false
+      seed:
+        type: integer
+        required: false
+      counterbalanced:
+        type: boolean
+        required: false
+
+  comparisons:
+    type: list[object]
+    required: false
+    description: Derived comparisons the runner should compute after execution.
+    item_fields:
+      id:
+        type: string
+      left:
+        type: string
+        description: Sequence label reference.
+      right:
+        type: string
+        description: Sequence label reference.
+      metric:
+        type: string
+        required: false
+        description: Comparison type such as delta, stability, persistence.
+
+  attached_rubrics:
+    type: list[string]
+    required: false
+    description: Rubric ids that should be applied for the experiment.
+
+  metadata:
+    type: object
+    required: false
+    description: Free-form experiment metadata.
+
+authoring_notes:
+  - Experiments should reference scenarios by id rather than embedding prompt text.
+  - ABAB experiments should use explicit labels like A1, B1, A2, B2.
+  - Keep comparisons declarative so the runner can compute them consistently.

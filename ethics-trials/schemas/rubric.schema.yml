@@ -1,0 +1,106 @@
+# Rubric schema for ethics-trials
+#
+# This file describes the expected shape of rubric definition files.
+# It is a project contract, not an executable rubric instance.
+
+kind: schema
+name: rubric
+version: 1
+
+description: >
+  Defines the structure of a rubric. A rubric describes how responses should be
+  checked, what behavioral signals should be extracted, and which optional
+  interpretation layers should run after deterministic analysis.
+
+required:
+  - id
+  - title
+  - layers
+
+fields:
+  id:
+    type: string
+    description: Stable rubric identifier.
+    example: behavioral/refusal-stability
+
+  title:
+    type: string
+    description: Human-readable rubric title.
+
+  description:
+    type: string
+    required: false
+    description: Short explanation of what the rubric measures.
+
+  tags:
+    type: list[string]
+    required: false
+    description: Search and grouping tags.
+
+  applies_to:
+    type: object
+    required: false
+    description: Optional scoping hints for scenarios or families.
+    fields:
+      families:
+        type: list[string]
+        required: false
+      response_modes:
+        type: list[string]
+        required: false
+
+  layers:
+    type: list[object]
+    description: Ordered grading and analysis layers.
+    item_fields:
+      id:
+        type: string
+      type:
+        type: string
+        allowed:
+          - deterministic_check
+          - signal_extraction
+          - judge_interpretation
+          - comparison_metric
+      description:
+        type: string
+        required: false
+      rules:
+        type: object
+        required: false
+        description: Layer-specific rule configuration.
+
+  signals:
+    type: list[object]
+    required: false
+    description: Named behavioral signals this rubric extracts.
+    item_fields:
+      id:
+        type: string
+      label:
+        type: string
+      type:
+        type: string
+        allowed:
+          - boolean
+          - categorical
+          - ordinal
+          - numeric
+      description:
+        type: string
+        required: false
+
+  weights:
+    type: object
+    required: false
+    description: Optional weights for rubric aggregation.
+
+  metadata:
+    type: object
+    required: false
+    description: Free-form rubric metadata.
+
+authoring_notes:
+  - Deterministic checks should come before judge-based interpretation.
+  - Signals should be named explicitly so they can be compared across runs.
+  - Rubrics should be reusable across multiple scenarios and experiments.

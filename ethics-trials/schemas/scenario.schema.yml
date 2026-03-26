@@ -1,0 +1,161 @@
+# Scenario schema for ethics-trials
+#
+# This file describes the expected shape of scenario definition files.
+# It is a project contract, not an executable scenario.
+
+kind: schema
+name: scenario
+version: 1
+
+description: >
+  Defines the structure of a behavioral scenario. A scenario describes the
+  situation being tested, the prompt material used to present it, the variants
+  that can be applied, and the rubrics relevant to its analysis.
+
+required:
+  - id
+  - title
+  - family
+  - description
+  - prompt
+
+fields:
+  id:
+    type: string
+    description: Stable scenario identifier.
+    example: mercy/simple-mercy-json
+
+  title:
+    type: string
+    description: Human-readable scenario title.
+
+  family:
+    type: string
+    description: >
+      Top-level scenario family. Used for grouping and filtering.
+    allowed_examples:
+      - mercy
+      - trolley
+      - resonance
+      - coercion
+      - authority
+      - baseline
+      - agent-planning
+
+  description:
+    type: string
+    description: Short explanation of what the scenario tests.
+
+  hypothesis:
+    type: string
+    required: false
+    description: Optional research hypothesis for this scenario.
+
+  tags:
+    type: list[string]
+    required: false
+    description: Search and grouping tags.
+
+  risk_level:
+    type: string
+    required: false
+    allowed:
+      - low
+      - medium
+      - high
+      - extreme
+    description: Operational risk level for the scenario.
+
+  response_mode:
+    type: string
+    required: false
+    allowed:
+      - decision
+      - classification
+      - planning
+      - freeform
+      - structured
+    description: Expected style of response.
+
+  output_formats:
+    type: list[string]
+    required: false
+    description: Allowed response format variants for this scenario.
+    allowed_examples:
+      - prose
+      - bullets
+      - json
+      - schema_block
+      - short_answer
+      - extended_justification
+
+  prompt:
+    type: object
+    description: Base prompt material used to render the scenario.
+    required:
+      - user
+    fields:
+      system:
+        type: string
+        required: false
+        description: Optional system prompt for the scenario.
+      user:
+        type: string
+        description: Base user-facing scenario prompt.
+      context:
+        type: string
+        required: false
+        description: Optional shared context block.
+
+  variants:
+    type: list[object]
+    required: false
+    description: Controlled perturbations of the base scenario.
+    item_fields:
+      id:
+        type: string
+      label:
+        type: string
+      description:
+        type: string
+        required: false
+      changes:
+        type: object
+        description: >
+          Declarative patch over the base scenario. Exact merge semantics to be
+          defined by the runner later.
+
+  conditions:
+    type: list[object]
+    required: false
+    description: Optional predeclared conditions for experiments to reference.
+    item_fields:
+      id:
+        type: string
+      label:
+        type: string
+      variant:
+        type: string
+        required: false
+      output_format:
+        type: string
+        required: false
+      prompt_overrides:
+        type: object
+        required: false
+
+  attached_rubrics:
+    type: list[string]
+    required: false
+    description: Rubric ids recommended for this scenario.
+
+  metadata:
+    type: object
+    required: false
+    description: Free-form metadata for provenance or notes.
+
+authoring_notes:
+  - Keep scenario ids stable once published.
+  - Put experiment sequencing in experiment files, not scenario files.
+  - Put scoring logic in rubric files, not scenario files.
+  - Prefer reusable variants over copy-pasted near-duplicate scenarios.

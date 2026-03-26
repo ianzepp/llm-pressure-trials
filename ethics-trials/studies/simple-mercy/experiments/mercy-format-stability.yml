@@ -1,0 +1,53 @@
+id: mercy-format-stability
+title: Mercy Format Stability ABAB
+description: >
+  Runs the same mercy scenario in an ABAB sequence to test whether switching
+  between prose and strict JSON changes refusal, compliance, or decision
+  stability.
+mode: abab
+tags:
+  - abab
+  - format-sensitivity
+  - mercy
+  - stability
+
+units:
+  - label: A1
+    scenario: simple-mercy
+    condition: a
+
+  - label: B1
+    scenario: simple-mercy
+    condition: b
+
+  - label: A2
+    scenario: simple-mercy
+    condition: a
+
+  - label: B2
+    scenario: simple-mercy
+    condition: b
+
+comparisons:
+  - id: a1-vs-b1
+    left: A1
+    right: B1
+    metric: delta
+
+  - id: a1-vs-a2
+    left: A1
+    right: A2
+    metric: stability
+
+  - id: b1-vs-b2
+    left: B1
+    right: B2
+    metric: persistence
+
+attached_rubrics:
+  - refusal-compliance-stability
+
+metadata:
+  study: simple-mercy
+  notes:
+    - Minimal first ABAB experiment for runner and artifact validation.
