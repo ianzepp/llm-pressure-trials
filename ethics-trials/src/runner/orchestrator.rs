@@ -81,8 +81,19 @@ pub fn execute_run_request(
     judge: JudgeConfig,
     jsonl: bool,
     continue_on_error: bool,
+    default_temperature: Option<f32>,
 ) -> Result<LiveRunSummary> {
-    let dry_run = expand_run_request(study, scenario_id, experiment_id, models)?;
+    let mut dry_run = expand_run_request(study, scenario_id, experiment_id, models)?;
+
+    // Apply CLI default temperature to any trial unit that doesn't already
+    // have a per-unit temperature set in the experiment YAML.
+    if let Some(temp) = default_temperature {
+        for unit in &mut dry_run.trial_units {
+            if unit.temperature.is_none() {
+                unit.temperature = Some(temp);
+            }
+        }
+    }
     let run_id = make_run_id()?;
     let selection = dry_run.selection.clone();
     let metadata = RunMetadata {

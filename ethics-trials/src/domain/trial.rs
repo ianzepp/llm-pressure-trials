@@ -14,6 +14,8 @@ pub struct TrialUnit {
     pub prompt: ResolvedPrompt,
     pub decisions: Vec<String>,
     pub repetition_index: u32,
+    #[serde(default)]
+    pub temperature: Option<f32>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

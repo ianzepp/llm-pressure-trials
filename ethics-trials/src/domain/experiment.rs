@@ -36,6 +36,8 @@ pub struct ExperimentUnit {
     pub output_format: Option<String>,
     #[serde(default)]
     pub repeat: Option<u32>,
+    #[serde(default)]
+    pub temperature: Option<f32>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

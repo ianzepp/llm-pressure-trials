@@ -36,6 +36,7 @@ impl OpenAiCompatibleClient {
         system: Option<&str>,
         context: Option<&str>,
         user: &str,
+        temperature: Option<f32>,
     ) -> Result<ProviderResponse> {
         let mut messages = Vec::new();
 
@@ -56,7 +57,7 @@ impl OpenAiCompatibleClient {
             content: user_content,
         });
 
-        self.complete(model, messages)
+        self.complete(model, messages, temperature)
     }
 
     pub fn chat_completion_followup(
@@ -67,6 +68,7 @@ impl OpenAiCompatibleClient {
         user: &str,
         assistant_response: &str,
         followup: &str,
+        temperature: Option<f32>,
     ) -> Result<ProviderResponse> {
         let mut messages = Vec::new();
 
@@ -95,14 +97,19 @@ impl OpenAiCompatibleClient {
             content: followup.to_owned(),
         });
 
-        self.complete(model, messages)
+        self.complete(model, messages, temperature)
     }
 
-    fn complete(&self, model: &str, messages: Vec<ChatMessage>) -> Result<ProviderResponse> {
+    fn complete(
+        &self,
+        model: &str,
+        messages: Vec<ChatMessage>,
+        temperature: Option<f32>,
+    ) -> Result<ProviderResponse> {
         let request = ChatCompletionRequest {
             model: model.to_owned(),
             messages,
-            temperature: Some(0.0),
+            temperature: Some(temperature.unwrap_or(0.0)),
             max_tokens: Some(800),
         };
 

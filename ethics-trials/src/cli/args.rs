@@ -96,6 +96,10 @@ pub struct RunArgs {
     pub judge: bool,
     #[arg(long, default_value = "openai/gpt-4.1-mini")]
     pub judge_model: String,
+    /// Default temperature for all trials. Overridden by per-unit temperature
+    /// in experiment YAML. Omit for the harness default (0.0).
+    #[arg(long)]
+    pub temperature: Option<f32>,
 }
 
 #[derive(Debug, Args)]

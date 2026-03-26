@@ -88,6 +88,7 @@ pub fn run(args: GradeArgs) -> Result<()> {
             },
             decisions: study.scenario.decisions.clone(),
             repetition_index: result.repetition_index,
+            temperature: None,
         };
 
         let (normalized, mut grading) = normalize_and_grade(&stub, &result.response.content);

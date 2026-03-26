@@ -271,7 +271,8 @@ pub fn run_judge(
     response_text: &str,
 ) -> Result<JudgeResult> {
     let prompt = build_judge_prompt(response_text);
-    let response = client.chat_completion(judge_model, None, None, &prompt)?;
+    // Judge always uses temp 0 for deterministic grading
+    let response = client.chat_completion(judge_model, None, None, &prompt, Some(0.0))?;
     parse_judge_response(&response.content)
 }
 

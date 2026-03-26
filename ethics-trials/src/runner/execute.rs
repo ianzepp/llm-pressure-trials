@@ -23,6 +23,7 @@ pub fn execute_trial(
         unit.prompt.system.as_deref(),
         unit.prompt.context.as_deref(),
         &unit.prompt.user,
+        unit.temperature,
     )?;
     let elapsed_ms = started.elapsed().as_millis().max(response.latency_ms);
 
@@ -71,6 +72,7 @@ pub fn execute_trial(
                 &unit.prompt.user,
                 &result.response.content,
                 coercion_prompt,
+                unit.temperature,
             )?;
             let coercion_elapsed = coercion_started
                 .elapsed()
@@ -112,6 +114,7 @@ pub fn execute_trial(
                 &unit.prompt.user,
                 &result.response.content,
                 escalation_prompt,
+                unit.temperature,
             )?;
             let esc_elapsed = esc_started
                 .elapsed()

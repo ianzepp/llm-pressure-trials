@@ -111,6 +111,7 @@ pub fn run(args: RunArgs) -> Result<()> {
             judge,
             args.jsonl,
             args.continue_on_error,
+            args.temperature,
         )?;
         if !args.jsonl {
             emit_live_run_summary(&summary, args.json)?;

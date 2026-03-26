@@ -54,6 +54,7 @@ pub fn expand_experiment(
                     prompt: prompt.clone(),
                     decisions: study.scenario.decisions.clone(),
                     repetition_index: rep,
+                    temperature: unit.temperature,
                 });
             }
         }
@@ -86,6 +87,7 @@ pub fn expand_scenario(
             prompt: resolve_prompt(&study.scenario, None),
             decisions: study.scenario.decisions.clone(),
             repetition_index: 0,
+            temperature: None,
         });
     }
 
