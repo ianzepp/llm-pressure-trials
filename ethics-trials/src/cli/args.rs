@@ -20,6 +20,7 @@ pub enum Command {
     Validate(ValidateArgs),
     Run(RunArgs),
     Report(ReportArgs),
+    Grade(GradeArgs),
     Sync(SyncArgs),
 }
 
@@ -95,6 +96,16 @@ pub struct RunArgs {
 
 #[derive(Debug, Args)]
 pub struct ReportArgs {
+    #[arg(long)]
+    pub study: String,
+    #[arg(long)]
+    pub run_id: Option<String>,
+    #[arg(long)]
+    pub json: bool,
+}
+
+#[derive(Debug, Args)]
+pub struct GradeArgs {
     #[arg(long)]
     pub study: String,
     #[arg(long)]

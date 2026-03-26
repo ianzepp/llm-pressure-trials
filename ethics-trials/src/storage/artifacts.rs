@@ -20,6 +20,17 @@ impl ArtifactWriter {
         Ok(Self { run_dir })
     }
 
+    pub fn existing(run_dir: &Path) -> Result<Self> {
+        anyhow::ensure!(
+            run_dir.exists(),
+            "run dir does not exist: {}",
+            run_dir.display()
+        );
+        Ok(Self {
+            run_dir: run_dir.to_path_buf(),
+        })
+    }
+
     pub fn run_dir(&self) -> &Path {
         &self.run_dir
     }

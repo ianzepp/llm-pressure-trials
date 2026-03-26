@@ -228,6 +228,31 @@ impl StudyDatabase {
         Ok(run_id)
     }
 
+    pub fn run_selection(&self, run_id: &str) -> Result<Option<String>> {
+        let conn = self.open()?;
+        let selection = conn
+            .query_row(
+                "SELECT selection FROM runs WHERE run_id = ?1",
+                params![run_id],
+                |row| row.get::<_, String>(0),
+            )
+            .optional()
+            .context("failed to query run selection from sqlite.db")?;
+        Ok(selection)
+    }
+
+    pub fn failed_trial_count(&self, run_id: &str) -> Result<usize> {
+        let conn = self.open()?;
+        let count: i64 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM failed_trials WHERE run_id = ?1",
+                params![run_id],
+                |row| row.get(0),
+            )
+            .context("failed to count failed trials from sqlite.db")?;
+        Ok(count as usize)
+    }
+
     pub fn build_run_report(&self, run_id: &str) -> Result<RunReport> {
         let conn = self.open()?;
         let run_meta = conn

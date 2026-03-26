@@ -1,7 +1,7 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[allow(dead_code)]
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TrialResult {
     pub trial_id: String,
     pub model_id: String,
@@ -14,7 +14,7 @@ pub struct TrialResult {
     pub grading: DeterministicGrade,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FailedTrial {
     pub trial_id: String,
     pub model_id: String,
@@ -22,7 +22,7 @@ pub struct FailedTrial {
     pub error: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RawModelResponse {
     pub content: String,
     pub tokens_in: Option<u32>,
@@ -30,7 +30,7 @@ pub struct RawModelResponse {
     pub latency_ms: u128,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NormalizedResponse {
     pub raw_text: String,
     pub parsed_json: Option<serde_json::Value>,
@@ -38,7 +38,7 @@ pub struct NormalizedResponse {
     pub justification: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DeterministicGrade {
     pub format_valid: bool,
     pub refusal_present: bool,

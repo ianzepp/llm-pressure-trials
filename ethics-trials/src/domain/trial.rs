@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct TrialUnit {
@@ -15,7 +15,7 @@ pub struct TrialUnit {
     pub repetition_index: u32,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ResolvedPrompt {
     pub system: Option<String>,
     pub user: String,
