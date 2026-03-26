@@ -6,6 +6,7 @@ use crate::loader::validate::validate_study;
 use crate::models::cache;
 use crate::models::registry;
 use crate::models::selection::{filter_model_ids, filter_models, parse_providers};
+use crate::runner::execute::JudgeConfig;
 use crate::runner::orchestrator::{
     DryRunSummary, LiveRunSummary, SchedulerConfig, execute_run_request, expand_run_request,
 };
@@ -96,6 +97,10 @@ pub fn run(args: RunArgs) -> Result<()> {
     } else {
         let root = std::env::current_dir()?;
         let pricing = cache::load_cached_pricing(&root).unwrap_or_default();
+        let judge = JudgeConfig {
+            enabled: args.judge,
+            model: args.judge_model.clone(),
+        };
         let summary = execute_run_request(
             &study,
             args.scenario.as_deref(),
@@ -103,6 +108,7 @@ pub fn run(args: RunArgs) -> Result<()> {
             &requested_models,
             &pricing,
             scheduler,
+            judge,
             args.jsonl,
             args.continue_on_error,
         )?;

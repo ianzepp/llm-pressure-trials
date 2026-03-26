@@ -7,8 +7,9 @@ use serde::Serialize;
 use crate::cli::args::GradeArgs;
 use crate::domain::result::{RunSummary, TrialResult};
 use crate::domain::trial::{ResolvedPrompt, TrialUnit};
-use crate::grading::normalize_and_grade;
+use crate::grading::{needs_judge, normalize_and_grade, run_judge};
 use crate::loader::studies::StudyLoader;
+use crate::providers::openai::OpenAiCompatibleClient;
 use crate::runner::compare::compare_results;
 use crate::storage::artifacts::ArtifactWriter;
 use crate::storage::sqlite::StudyDatabase;
@@ -19,6 +20,7 @@ struct GradeSummary {
     study_id: String,
     trials_regraded: usize,
     decisions_changed: usize,
+    trials_judged: usize,
     comparisons_regenerated: usize,
 }
 
@@ -43,12 +45,19 @@ pub fn run(args: GradeArgs) -> Result<()> {
         );
     }
 
+    let judge_client = if args.judge {
+        Some(OpenAiCompatibleClient::from_env()?)
+    } else {
+        None
+    };
+
     let file = fs::File::open(&jsonl_path)
         .with_context(|| format!("failed to open {}", jsonl_path.display()))?;
     let reader = BufReader::new(file);
 
     let mut results: Vec<TrialResult> = Vec::new();
     let mut decisions_changed = 0usize;
+    let mut trials_judged = 0usize;
 
     for line in reader.lines() {
         let line = line.context("failed to read line from trial_results.jsonl")?;
@@ -79,12 +88,38 @@ pub fn run(args: GradeArgs) -> Result<()> {
             repetition_index: result.repetition_index,
         };
 
-        let (normalized, grading) = normalize_and_grade(&stub, &result.response.content);
+        let (normalized, mut grading) = normalize_and_grade(&stub, &result.response.content);
+
+        if let Some(client) = &judge_client {
+            if needs_judge(&normalized, &grading) {
+                if let Ok(jr) = run_judge(client, &args.judge_model, &result.response.content) {
+                    grading.judge_decision = Some(jr.decision);
+                    grading.judge_compliance = Some(jr.compliance);
+                    grading.judge_reasoning = Some(jr.reasoning);
+                    grading.judge_model = Some(args.judge_model.clone());
+                    trials_judged += 1;
+                }
+            }
+        }
+
         result.normalized = normalized;
         result.grading = grading;
 
         if let Some(coercion_resp) = &result.coercion_response {
-            let (cn, cg) = normalize_and_grade(&stub, &coercion_resp.content);
+            let (cn, mut cg) = normalize_and_grade(&stub, &coercion_resp.content);
+
+            if let Some(client) = &judge_client {
+                if needs_judge(&cn, &cg) {
+                    if let Ok(jr) = run_judge(client, &args.judge_model, &coercion_resp.content) {
+                        cg.judge_decision = Some(jr.decision);
+                        cg.judge_compliance = Some(jr.compliance);
+                        cg.judge_reasoning = Some(jr.reasoning);
+                        cg.judge_model = Some(args.judge_model.clone());
+                        trials_judged += 1;
+                    }
+                }
+            }
+
             result.coercion_normalized = Some(cn);
             result.coercion_grading = Some(cg);
         }
@@ -115,9 +150,7 @@ pub fn run(args: GradeArgs) -> Result<()> {
         .with_context(|| format!("failed to rename temp file to {}", jsonl_path.display()))?;
 
     // Resolve experiment for comparison regeneration
-    let selection = database
-        .run_selection(&run_id)?
-        .unwrap_or_default();
+    let selection = database.run_selection(&run_id)?.unwrap_or_default();
     let experiment_id = selection.strip_prefix("experiment:");
     let experiment =
         experiment_id.and_then(|id| study.experiments.iter().find(|item| item.id == id));
@@ -154,6 +187,7 @@ pub fn run(args: GradeArgs) -> Result<()> {
         study_id: study.id,
         trials_regraded: results.len(),
         decisions_changed,
+        trials_judged,
         comparisons_regenerated: comparisons.len(),
     };
 
@@ -164,6 +198,7 @@ pub fn run(args: GradeArgs) -> Result<()> {
         println!("study: {}", grade_summary.study_id);
         println!("trials regraded: {}", grade_summary.trials_regraded);
         println!("decisions changed: {}", grade_summary.decisions_changed);
+        println!("trials judged: {}", grade_summary.trials_judged);
         println!(
             "comparisons regenerated: {}",
             grade_summary.comparisons_regenerated

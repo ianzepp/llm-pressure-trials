@@ -543,6 +543,9 @@ pub struct AggregateStats {
     pub refusal_shift_count: usize,
     pub coercion_attempts: usize,
     pub coercion_overrides: usize,
+    pub judged_count: usize,
+    pub judged_decision_counts: Vec<(String, usize)>,
+    pub judged_compliance_counts: Vec<(String, usize)>,
     pub usage: UsageStats,
 }
 
@@ -612,6 +615,10 @@ struct StoredGrading {
     compliance_level: String,
     harmful_specificity: u8,
     hedging_level: u8,
+    #[serde(default)]
+    judge_decision: Option<String>,
+    #[serde(default)]
+    judge_compliance: Option<String>,
 }
 
 impl AggregateStats {
@@ -639,6 +646,9 @@ impl AggregateStats {
         let mut cost_sum = 0.0f64;
         let mut coercion_attempts = 0usize;
         let mut coercion_overrides = 0usize;
+        let mut judged_count = 0usize;
+        let mut judged_decisions = std::collections::BTreeMap::<String, usize>::new();
+        let mut judged_compliances = std::collections::BTreeMap::<String, usize>::new();
 
         for row in trial_rows
             .iter()
@@ -691,6 +701,14 @@ impl AggregateStats {
                     coercion_overrides += 1;
                 }
             }
+
+            if let Some(jd) = &row.grading.judge_decision {
+                judged_count += 1;
+                *judged_decisions.entry(jd.clone()).or_insert(0) += 1;
+            }
+            if let Some(jc) = &row.grading.judge_compliance {
+                *judged_compliances.entry(jc.clone()).or_insert(0) += 1;
+            }
         }
 
         let filtered_comparisons = comparison_rows
@@ -721,6 +739,9 @@ impl AggregateStats {
             refusal_shift_count,
             coercion_attempts,
             coercion_overrides,
+            judged_count,
+            judged_decision_counts: judged_decisions.into_iter().collect(),
+            judged_compliance_counts: judged_compliances.into_iter().collect(),
             usage: UsageStats {
                 total_tokens_in: tokens_in_sum,
                 total_tokens_out: tokens_out_sum,
@@ -785,10 +806,12 @@ fn compute_votes(trial_rows: &[TrialReportRow], model_id: &str) -> Vec<VoteSumma
         .iter()
         .filter(|row| row.model_id == model_id)
     {
-        // Use coercion decision if available, otherwise primary decision
+        // Prefer judge decision > coercion decision > primary decision
         let decision = row
-            .coercion_decision
+            .grading
+            .judge_decision
             .clone()
+            .or_else(|| row.coercion_decision.clone())
             .or_else(|| row.normalized.decision.clone())
             .unwrap_or_else(|| "NONE".to_owned());
         *by_condition

@@ -52,6 +52,14 @@ pub struct DeterministicGrade {
     pub harmful_specificity: u8,
     pub hedging_level: u8,
     pub notes: Vec<String>,
+    #[serde(default)]
+    pub judge_decision: Option<String>,
+    #[serde(default)]
+    pub judge_compliance: Option<String>,
+    #[serde(default)]
+    pub judge_reasoning: Option<String>,
+    #[serde(default)]
+    pub judge_model: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]

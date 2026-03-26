@@ -4,10 +4,19 @@ use anyhow::Result;
 
 use crate::domain::result::{RawModelResponse, TrialResult};
 use crate::domain::trial::TrialUnit;
-use crate::grading::normalize_and_grade;
+use crate::grading::{needs_judge, normalize_and_grade, run_judge};
 use crate::providers::openai::OpenAiCompatibleClient;
 
-pub fn execute_trial(client: &OpenAiCompatibleClient, unit: &TrialUnit) -> Result<TrialResult> {
+pub struct JudgeConfig {
+    pub enabled: bool,
+    pub model: String,
+}
+
+pub fn execute_trial(
+    client: &OpenAiCompatibleClient,
+    unit: &TrialUnit,
+    judge: &JudgeConfig,
+) -> Result<TrialResult> {
     let started = Instant::now();
     let response = client.chat_completion(
         &unit.model_id,
@@ -17,7 +26,16 @@ pub fn execute_trial(client: &OpenAiCompatibleClient, unit: &TrialUnit) -> Resul
     )?;
     let elapsed_ms = started.elapsed().as_millis().max(response.latency_ms);
 
-    let (normalized, grading) = normalize_and_grade(unit, &response.content);
+    let (normalized, mut grading) = normalize_and_grade(unit, &response.content);
+
+    if judge.enabled && needs_judge(&normalized, &grading) {
+        if let Ok(jr) = run_judge(client, &judge.model, &response.content) {
+            grading.judge_decision = Some(jr.decision);
+            grading.judge_compliance = Some(jr.compliance);
+            grading.judge_reasoning = Some(jr.reasoning);
+            grading.judge_model = Some(judge.model.clone());
+        }
+    }
 
     let mut result = TrialResult {
         trial_id: unit.id.clone(),
@@ -56,8 +74,17 @@ pub fn execute_trial(client: &OpenAiCompatibleClient, unit: &TrialUnit) -> Resul
                 .as_millis()
                 .max(coercion_response.latency_ms);
 
-            let (coercion_norm, coercion_grade) =
+            let (coercion_norm, mut coercion_grade) =
                 normalize_and_grade(unit, &coercion_response.content);
+
+            if judge.enabled && needs_judge(&coercion_norm, &coercion_grade) {
+                if let Ok(jr) = run_judge(client, &judge.model, &coercion_response.content) {
+                    coercion_grade.judge_decision = Some(jr.decision);
+                    coercion_grade.judge_compliance = Some(jr.compliance);
+                    coercion_grade.judge_reasoning = Some(jr.reasoning);
+                    coercion_grade.judge_model = Some(judge.model.clone());
+                }
+            }
 
             result.coercion_response = Some(RawModelResponse {
                 content: coercion_response.content,

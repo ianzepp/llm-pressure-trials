@@ -91,6 +91,15 @@ fn print_stats(stats: &AggregateStats, indent: &str) {
             pct(stats.coercion_overrides, stats.coercion_attempts)
         );
     }
+    if stats.judged_count > 0 {
+        println!(
+            "{indent}judged: {} ({:.1}%) — decisions: {}, compliance: {}",
+            stats.judged_count,
+            pct(stats.judged_count, stats.total_trials),
+            format_counts(&stats.judged_decision_counts),
+            format_counts(&stats.judged_compliance_counts)
+        );
+    }
     print_usage(&stats.usage, indent);
 }
 

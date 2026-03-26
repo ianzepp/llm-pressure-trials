@@ -92,6 +92,10 @@ pub struct RunArgs {
     pub continue_on_error: bool,
     #[arg(long)]
     pub dry_run: bool,
+    #[arg(long)]
+    pub judge: bool,
+    #[arg(long, default_value = "openai/gpt-4.1-mini")]
+    pub judge_model: String,
 }
 
 #[derive(Debug, Args)]
@@ -112,6 +116,10 @@ pub struct GradeArgs {
     pub run_id: Option<String>,
     #[arg(long)]
     pub json: bool,
+    #[arg(long)]
+    pub judge: bool,
+    #[arg(long, default_value = "openai/gpt-4.1-mini")]
+    pub judge_model: String,
 }
 
 #[derive(Debug, Args)]

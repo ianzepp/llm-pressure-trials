@@ -1,6 +1,6 @@
 use std::collections::{HashMap, VecDeque};
 use std::io::Write;
-use std::sync::mpsc;
+use std::sync::{Arc, mpsc};
 use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, bail};
@@ -13,7 +13,7 @@ use crate::domain::trial::TrialUnit;
 use crate::loader::studies::LoadedStudy;
 use crate::providers::openai::OpenAiCompatibleClient;
 use crate::runner::compare::compare_results;
-use crate::runner::execute::execute_trial;
+use crate::runner::execute::{JudgeConfig, execute_trial};
 use crate::runner::plan::{expand_experiment, expand_scenario};
 use crate::storage::artifacts::ArtifactWriter;
 use crate::storage::sqlite::StudyDatabase;
@@ -78,6 +78,7 @@ pub fn execute_run_request(
     models: &[String],
     pricing: &HashMap<String, ModelPricing>,
     scheduler: SchedulerConfig,
+    judge: JudgeConfig,
     jsonl: bool,
     continue_on_error: bool,
 ) -> Result<LiveRunSummary> {
@@ -106,6 +107,7 @@ pub fn execute_run_request(
     writer.write_pricing(&run_pricing)?;
 
     let client = OpenAiCompatibleClient::from_env()?;
+    let judge = Arc::new(judge);
     let mut results: Vec<TrialResult> = Vec::new();
     let mut failures: Vec<FailedTrial> = Vec::new();
     let grouped_units = group_trial_units(&dry_run.trial_units);
@@ -246,6 +248,7 @@ pub fn execute_run_request(
         {
             let tx = tx.clone();
             let client = client.clone();
+            let judge_ref = Arc::clone(&judge);
             let launched_trial_id = unit.id.clone();
             let launched_model_id = unit.model_id.clone();
             let launched_condition_label = unit.condition_label.clone();
@@ -270,7 +273,7 @@ pub fn execute_run_request(
             )?;
 
             std::thread::spawn(move || {
-                let result = execute_trial(&client, &unit);
+                let result = execute_trial(&client, &unit, &judge_ref);
                 send_worker_message(
                     &tx,
                     WorkerMessage {
