@@ -24,6 +24,8 @@ Implemented today:
 - study-local SQLite index at `studies/<study>/sqlite.db`
 - OpenRouter model catalog sync into `.cache/openrouter/models.json`
 - run reporting from SQLite
+- baseline unit coverage for runner/provider correctness edges
+- hygiene ratchet coverage for panic/error-dropping debt patterns
 
 Not implemented yet:
 
@@ -47,6 +49,16 @@ export OPENROUTER_API_KEY="your-key-here"
 
 ```bash
 cargo check
+```
+
+## Validate
+
+```bash
+cargo test
+```
+
+```bash
+cargo clippy --all-targets -- -D warnings
 ```
 
 ## Project Layout

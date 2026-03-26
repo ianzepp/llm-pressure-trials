@@ -90,7 +90,10 @@ impl OpenAiCompatibleClient {
         Ok(ProviderResponse {
             content,
             tokens_in: parsed.usage.as_ref().and_then(|item| item.prompt_tokens),
-            tokens_out: parsed.usage.as_ref().and_then(|item| item.completion_tokens),
+            tokens_out: parsed
+                .usage
+                .as_ref()
+                .and_then(|item| item.completion_tokens),
             latency_ms,
         })
     }
@@ -152,7 +155,9 @@ fn map_ureq_error(error: ureq::Error) -> anyhow::Error {
                 truncate(&body, 500)
             )
         }
-        ureq::Error::Transport(transport) => anyhow::anyhow!("provider transport error: {}", transport),
+        ureq::Error::Transport(transport) => {
+            anyhow::anyhow!("provider transport error: {}", transport)
+        }
     }
 }
 
@@ -167,7 +172,18 @@ fn truncate(value: &str, limit: usize) -> String {
     if value.len() <= limit {
         value.to_owned()
     } else {
-        format!("{}...", &value[..limit])
+        let boundary = value
+            .char_indices()
+            .map(|(idx, _)| idx)
+            .take_while(|idx| *idx < limit)
+            .last()
+            .unwrap_or(0);
+
+        if boundary == 0 {
+            "...".to_owned()
+        } else {
+            format!("{}...", &value[..boundary])
+        }
     }
 }
 
@@ -234,3 +250,7 @@ pub struct OpenRouterModel {
     #[serde(default)]
     pub per_request_limits: Option<serde_json::Value>,
 }
+
+#[cfg(test)]
+#[path = "openai_test.rs"]
+mod tests;

@@ -13,12 +13,19 @@ pub fn compare_results(
 
     let mut indexed = HashMap::new();
     for result in results {
-        indexed.insert((result.model_id.clone(), result.condition_label.clone()), result);
+        indexed.insert(
+            (result.model_id.clone(), result.condition_label.clone()),
+            result,
+        );
     }
 
     let mut comparisons = Vec::new();
 
-    for model_id in results.iter().map(|item| item.model_id.clone()).collect::<std::collections::BTreeSet<_>>() {
+    for model_id in results
+        .iter()
+        .map(|item| item.model_id.clone())
+        .collect::<std::collections::BTreeSet<_>>()
+    {
         for comparison in &experiment.comparisons {
             let left = indexed.get(&(model_id.clone(), comparison.left.clone()));
             let right = indexed.get(&(model_id.clone(), comparison.right.clone()));
@@ -34,7 +41,8 @@ pub fn compare_results(
                     right_decision: right.normalized.decision.clone(),
                     decision_shift: left.normalized.decision != right.normalized.decision,
                     refusal_shift: left.grading.refusal_present != right.grading.refusal_present,
-                    hedging_delta: right.grading.hedging_level as i16 - left.grading.hedging_level as i16,
+                    hedging_delta: right.grading.hedging_level as i16
+                        - left.grading.hedging_level as i16,
                     specificity_delta: right.grading.harmful_specificity as i16
                         - left.grading.harmful_specificity as i16,
                 });

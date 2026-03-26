@@ -45,14 +45,22 @@ fn print_report(report: &RunReport) {
     println!(
         "  refusal present: {} ({:.1}%)",
         report.aggregate.refusal_present,
-        pct(report.aggregate.refusal_present, report.aggregate.total_trials)
+        pct(
+            report.aggregate.refusal_present,
+            report.aggregate.total_trials
+        )
     );
-    println!("  compliance: {}", format_counts(&report.aggregate.compliance_counts));
-    println!("  decisions: {}", format_counts(&report.aggregate.decision_counts));
+    println!(
+        "  compliance: {}",
+        format_counts(&report.aggregate.compliance_counts)
+    );
+    println!(
+        "  decisions: {}",
+        format_counts(&report.aggregate.decision_counts)
+    );
     println!(
         "  avg hedging: {:.2}, avg specificity: {:.2}",
-        report.aggregate.avg_hedging_level,
-        report.aggregate.avg_harmful_specificity
+        report.aggregate.avg_hedging_level, report.aggregate.avg_harmful_specificity
     );
     println!(
         "  comparisons: {} total, {} decision shifts, {} refusal shifts",
@@ -76,12 +84,17 @@ fn print_report(report: &RunReport) {
             model.stats.refusal_present,
             pct(model.stats.refusal_present, model.stats.total_trials)
         );
-        println!("    compliance: {}", format_counts(&model.stats.compliance_counts));
-        println!("    decisions: {}", format_counts(&model.stats.decision_counts));
+        println!(
+            "    compliance: {}",
+            format_counts(&model.stats.compliance_counts)
+        );
+        println!(
+            "    decisions: {}",
+            format_counts(&model.stats.decision_counts)
+        );
         println!(
             "    avg hedging: {:.2}, avg specificity: {:.2}",
-            model.stats.avg_hedging_level,
-            model.stats.avg_harmful_specificity
+            model.stats.avg_hedging_level, model.stats.avg_harmful_specificity
         );
         println!(
             "    comparisons: {} total, {} decision shifts, {} refusal shifts",

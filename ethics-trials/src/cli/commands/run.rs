@@ -2,12 +2,12 @@ use anyhow::{Result, bail};
 
 use crate::cli::args::RunArgs;
 use crate::loader::studies::StudyLoader;
-use crate::models::cache;
 use crate::loader::validate::validate_study;
+use crate::models::cache;
 use crate::models::registry;
 use crate::models::selection::{filter_model_ids, filter_models, parse_providers};
 use crate::runner::orchestrator::{
-    DryRunSummary, LiveRunSummary, SchedulerConfig, expand_run_request, execute_run_request,
+    DryRunSummary, LiveRunSummary, SchedulerConfig, execute_run_request, expand_run_request,
 };
 
 pub fn run(args: RunArgs) -> Result<()> {
@@ -43,8 +43,8 @@ pub fn run(args: RunArgs) -> Result<()> {
 
     let requested_models = if let Some(pattern) = args.pattern.as_deref() {
         let root = std::env::current_dir()?;
-        let available_models = cache::load_cached_models(&root)
-            .unwrap_or_else(|_| registry::built_in_models());
+        let available_models =
+            cache::load_cached_models(&root).unwrap_or_else(|_| registry::built_in_models());
         let matched = filter_models(
             available_models,
             Some(pattern),
@@ -71,7 +71,8 @@ pub fn run(args: RunArgs) -> Result<()> {
         .map(|item| item.id)
         .collect()
     } else {
-        let filtered = filter_model_ids(args.model.clone(), provider_filters.as_deref(), args.limit);
+        let filtered =
+            filter_model_ids(args.model.clone(), provider_filters.as_deref(), args.limit);
         if filtered.is_empty() {
             bail!("no explicit models remained after provider/limit filtering");
         }

@@ -15,11 +15,16 @@ pub fn run(args: ListArgs) -> Result<()> {
             emit(&studies, args.json)
         }
         ListTarget::Experiments => {
-            let study_id = args.study.as_deref().ok_or_else(|| {
-                anyhow::anyhow!("--study is required for `list experiments`")
-            })?;
+            let study_id = args
+                .study
+                .as_deref()
+                .ok_or_else(|| anyhow::anyhow!("--study is required for `list experiments`"))?;
             let study = loader.load_study(study_id)?;
-            let ids: Vec<String> = study.experiments.iter().map(|item| item.id.clone()).collect();
+            let ids: Vec<String> = study
+                .experiments
+                .iter()
+                .map(|item| item.id.clone())
+                .collect();
             emit(&ids, args.json)
         }
         ListTarget::Rubrics => {
@@ -42,8 +47,8 @@ pub fn run(args: ListArgs) -> Result<()> {
         }
         ListTarget::Models => {
             let root = std::env::current_dir()?;
-            let models = cache::load_cached_models(&root)
-                .unwrap_or_else(|_| registry::built_in_models());
+            let models =
+                cache::load_cached_models(&root).unwrap_or_else(|_| registry::built_in_models());
             let providers = parse_providers(args.providers.as_deref());
             let models = filter_models(models, args.pattern.as_deref(), providers.as_deref(), None);
             emit(&models, args.json)

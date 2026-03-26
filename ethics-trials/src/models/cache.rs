@@ -40,9 +40,12 @@ struct OpenRouterModelCacheEntry {
     per_request_limits: serde_json::Value,
 }
 
-pub fn write_openrouter_models_cache(root: &Path, client: &OpenAiCompatibleClient) -> Result<CacheSyncSummary> {
+pub fn write_openrouter_models_cache(
+    root: &Path,
+    client: &OpenAiCompatibleClient,
+) -> Result<CacheSyncSummary> {
     let response = client.list_models()?;
-    let synced_at_unix_ms = unix_time_ms();
+    let synced_at_unix_ms = unix_time_ms()?;
     let cache_path = root.join(CACHE_DIR).join(CACHE_FILE);
 
     if let Some(parent) = cache_path.parent() {
@@ -101,9 +104,9 @@ pub fn load_cached_models(root: &Path) -> Result<Vec<ModelTarget>> {
         .collect())
 }
 
-fn unix_time_ms() -> u128 {
+fn unix_time_ms() -> Result<u128> {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
-        .expect("system time before unix epoch")
-        .as_millis()
+        .context("system clock is set before the unix epoch")
+        .map(|duration| duration.as_millis())
 }

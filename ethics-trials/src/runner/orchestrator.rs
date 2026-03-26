@@ -3,7 +3,7 @@ use std::io::Write;
 use std::sync::mpsc;
 use std::time::{Duration, Instant};
 
-use anyhow::Result;
+use anyhow::{Context, Result, bail};
 use serde::Serialize;
 use serde_json::json;
 
@@ -51,9 +51,15 @@ pub fn expand_run_request(
     models: &[String],
 ) -> Result<DryRunSummary> {
     let (selection, trial_units) = match (scenario_id, experiment_id) {
-        (Some(id), None) => (format!("scenario:{id}"), expand_scenario(study, id, models)?),
-        (None, Some(id)) => (format!("experiment:{id}"), expand_experiment(study, id, models)?),
-        _ => unreachable!("caller validates mutually exclusive selection"),
+        (Some(id), None) => (
+            format!("scenario:{id}"),
+            expand_scenario(study, id, models)?,
+        ),
+        (None, Some(id)) => (
+            format!("experiment:{id}"),
+            expand_experiment(study, id, models)?,
+        ),
+        _ => bail!("exactly one of scenario_id or experiment_id must be set"),
     };
 
     Ok(DryRunSummary {
@@ -74,14 +80,14 @@ pub fn execute_run_request(
     continue_on_error: bool,
 ) -> Result<LiveRunSummary> {
     let dry_run = expand_run_request(study, scenario_id, experiment_id, models)?;
-    let run_id = make_run_id();
+    let run_id = make_run_id()?;
     let selection = dry_run.selection.clone();
     let metadata = RunMetadata {
         run_id: run_id.clone(),
         study_id: study.id.clone(),
         selection: selection.clone(),
         models: models.to_vec(),
-        created_at_unix_ms: unix_time_ms(),
+        created_at_unix_ms: unix_time_ms()?,
     };
 
     let writer = ArtifactWriter::new(&study.root, &run_id)?;
@@ -109,7 +115,7 @@ pub fn execute_run_request(
     emit_jsonl_event(
         jsonl,
         json!({
-            "ts_unix_ms": unix_time_ms(),
+            "ts_unix_ms": unix_time_ms()?,
             "event": "run_started",
             "run_id": run_id,
             "study_id": study.id,
@@ -130,7 +136,7 @@ pub fn execute_run_request(
                     emit_jsonl_event(
                         jsonl,
                         json!({
-                            "ts_unix_ms": unix_time_ms(),
+                            "ts_unix_ms": unix_time_ms()?,
                             "event": "trial_completed",
                             "run_id": run_id,
                             "study_id": study.id,
@@ -161,7 +167,7 @@ pub fn execute_run_request(
                     emit_jsonl_event(
                         jsonl,
                         json!({
-                            "ts_unix_ms": unix_time_ms(),
+                            "ts_unix_ms": unix_time_ms()?,
                             "event": "trial_failed",
                             "run_id": run_id,
                             "study_id": study.id,
@@ -191,7 +197,7 @@ pub fn execute_run_request(
                 emit_jsonl_event(
                     jsonl,
                     json!({
-                        "ts_unix_ms": unix_time_ms(),
+                        "ts_unix_ms": unix_time_ms()?,
                         "event": "backpressure_off",
                         "run_id": run_id,
                         "study_id": study.id,
@@ -203,69 +209,71 @@ pub fn execute_run_request(
             }
         }
 
-        if inflight >= scheduler.high_water {
-            if !backpressured {
-                backpressured = true;
-                emit_jsonl_event(
-                    jsonl,
-                    json!({
-                        "ts_unix_ms": unix_time_ms(),
-                        "event": "backpressure_on",
-                        "run_id": run_id,
-                        "study_id": study.id,
-                        "in_flight": inflight,
-                        "high_water": scheduler.high_water,
-                        "low_water": scheduler.low_water,
-                    }),
-                )?;
-            }
+        if inflight >= scheduler.high_water && !backpressured {
+            backpressured = true;
+            emit_jsonl_event(
+                jsonl,
+                json!({
+                    "ts_unix_ms": unix_time_ms()?,
+                    "event": "backpressure_on",
+                    "run_id": run_id,
+                    "study_id": study.id,
+                    "in_flight": inflight,
+                    "high_water": scheduler.high_water,
+                    "low_water": scheduler.low_water,
+                }),
+            )?;
         }
 
         let launch_due = last_launch.is_none_or(|last| {
             last.elapsed() >= Duration::from_millis(scheduler.launch_interval_ms)
         });
 
-        if !backpressured && inflight < scheduler.high_water && launch_due {
-            if let Some(sequence_index) = ready.pop_front() {
-                if let Some(unit) = sequences[sequence_index].pop_front() {
-                    let tx = tx.clone();
-                    let client = client.clone();
-                    let launched_trial_id = unit.id.clone();
-                    let launched_model_id = unit.model_id.clone();
-                    let launched_condition_label = unit.condition_label.clone();
-                    inflight += 1;
-                    last_launch = Some(Instant::now());
+        if !backpressured
+            && inflight < scheduler.high_water
+            && launch_due
+            && let Some(sequence_index) = ready.pop_front()
+            && let Some(unit) = sequences[sequence_index].pop_front()
+        {
+            let tx = tx.clone();
+            let client = client.clone();
+            let launched_trial_id = unit.id.clone();
+            let launched_model_id = unit.model_id.clone();
+            let launched_condition_label = unit.condition_label.clone();
+            inflight += 1;
+            last_launch = Some(Instant::now());
 
-                    emit_jsonl_event(
-                        jsonl,
-                        json!({
-                            "ts_unix_ms": unix_time_ms(),
-                            "event": "trial_launched",
-                            "run_id": run_id,
-                            "study_id": study.id,
-                            "trial_id": launched_trial_id,
-                            "model_id": launched_model_id,
-                            "condition_label": launched_condition_label,
-                            "in_flight": inflight,
-                            "high_water": scheduler.high_water,
-                            "low_water": scheduler.low_water,
-                            "launch_interval_ms": scheduler.launch_interval_ms,
-                        }),
-                    )?;
+            emit_jsonl_event(
+                jsonl,
+                json!({
+                    "ts_unix_ms": unix_time_ms()?,
+                    "event": "trial_launched",
+                    "run_id": run_id,
+                    "study_id": study.id,
+                    "trial_id": launched_trial_id,
+                    "model_id": launched_model_id,
+                    "condition_label": launched_condition_label,
+                    "in_flight": inflight,
+                    "high_water": scheduler.high_water,
+                    "low_water": scheduler.low_water,
+                    "launch_interval_ms": scheduler.launch_interval_ms,
+                }),
+            )?;
 
-                    std::thread::spawn(move || {
-                        let result = execute_trial(&client, &unit);
-                        let _ = tx.send(WorkerMessage {
-                            sequence_index,
-                            trial_id: unit.id.clone(),
-                            model_id: unit.model_id.clone(),
-                            condition_label: unit.condition_label.clone(),
-                            result,
-                        });
-                    });
-                    continue;
-                }
-            }
+            std::thread::spawn(move || {
+                let result = execute_trial(&client, &unit);
+                send_worker_message(
+                    &tx,
+                    WorkerMessage {
+                        sequence_index,
+                        trial_id: unit.id.clone(),
+                        model_id: unit.model_id.clone(),
+                        condition_label: unit.condition_label.clone(),
+                        result,
+                    },
+                );
+            });
+            continue;
         }
 
         if completed == total_trials {
@@ -280,7 +288,7 @@ pub fn execute_run_request(
                         emit_jsonl_event(
                             jsonl,
                             json!({
-                                "ts_unix_ms": unix_time_ms(),
+                                "ts_unix_ms": unix_time_ms()?,
                                 "event": "trial_completed",
                                 "run_id": run_id,
                                 "study_id": study.id,
@@ -311,7 +319,7 @@ pub fn execute_run_request(
                         emit_jsonl_event(
                             jsonl,
                             json!({
-                                "ts_unix_ms": unix_time_ms(),
+                                "ts_unix_ms": unix_time_ms()?,
                                 "event": "trial_failed",
                                 "run_id": run_id,
                                 "study_id": study.id,
@@ -341,7 +349,7 @@ pub fn execute_run_request(
                     emit_jsonl_event(
                         jsonl,
                         json!({
-                            "ts_unix_ms": unix_time_ms(),
+                            "ts_unix_ms": unix_time_ms()?,
                             "event": "backpressure_off",
                             "run_id": run_id,
                             "study_id": study.id,
@@ -363,7 +371,8 @@ pub fn execute_run_request(
         }
     }
 
-    let experiment = experiment_id.and_then(|id| study.experiments.iter().find(|item| item.id == id));
+    let experiment =
+        experiment_id.and_then(|id| study.experiments.iter().find(|item| item.id == id));
     let comparisons: Vec<ComparisonResult> = compare_results(experiment, &results);
     writer.write_comparisons(&comparisons)?;
     database.replace_comparisons(&run_id, &comparisons)?;
@@ -384,7 +393,7 @@ pub fn execute_run_request(
     emit_jsonl_event(
         jsonl,
         json!({
-            "ts_unix_ms": unix_time_ms(),
+            "ts_unix_ms": unix_time_ms()?,
             "event": "run_completed",
             "run_id": run_id,
             "study_id": study.id,
@@ -442,15 +451,21 @@ fn group_trial_units(
     grouped
 }
 
-fn unix_time_ms() -> u128 {
+fn unix_time_ms() -> Result<u128> {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
-        .expect("system time before unix epoch")
-        .as_millis()
+        .context("system clock is set before the unix epoch")
+        .map(|duration| duration.as_millis())
 }
 
-fn make_run_id() -> String {
-    format!("run-{}", unix_time_ms())
+fn make_run_id() -> Result<String> {
+    Ok(format!("run-{}", unix_time_ms()?))
+}
+
+fn send_worker_message(tx: &mpsc::Sender<WorkerMessage>, message: WorkerMessage) {
+    if tx.send(message).is_err() {
+        // The scheduler can drop the receiver when it exits early after a fatal trial failure.
+    }
 }
 
 fn emit_jsonl_event(enabled: bool, value: serde_json::Value) -> Result<()> {
@@ -464,3 +479,7 @@ fn emit_jsonl_event(enabled: bool, value: serde_json::Value) -> Result<()> {
     stdout.flush()?;
     Ok(())
 }
+
+#[cfg(test)]
+#[path = "orchestrator_test.rs"]
+mod tests;

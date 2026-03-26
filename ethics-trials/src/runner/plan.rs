@@ -23,12 +23,7 @@ pub fn expand_experiment(
                 .condition
                 .as_deref()
                 .and_then(|condition_id| find_condition(&study.scenario, condition_id));
-            let variant = unit
-                .variant
-                .as_deref()
-                .map(|variant_id| find_variant(&study.scenario, variant_id))
-                .transpose()?
-                .or_else(|| condition.and_then(|item| item.variant.as_deref()).and_then(|variant_id| find_variant(&study.scenario, variant_id).ok()));
+            let variant = select_variant(&study.scenario, unit.variant.as_deref(), condition)?;
 
             let prompt = resolve_prompt(&study.scenario, variant.as_ref());
             let condition_label = unit.label.clone();
@@ -36,7 +31,11 @@ pub fn expand_experiment(
                 .output_format
                 .clone()
                 .or_else(|| condition.and_then(|item| item.output_format.clone()))
-                .or_else(|| variant.as_ref().and_then(|item| item.changes.output_format.clone()));
+                .or_else(|| {
+                    variant
+                        .as_ref()
+                        .and_then(|item| item.changes.output_format.clone())
+                });
 
             units.push(TrialUnit {
                 id: format!("{experiment_id}:{condition_label}:{model_id}"),
@@ -86,8 +85,14 @@ pub fn expand_scenario(
     Ok(units)
 }
 
-fn find_condition<'a>(scenario: &'a ScenarioDefinition, condition_id: &str) -> Option<&'a ScenarioCondition> {
-    scenario.conditions.iter().find(|item| item.id == condition_id)
+fn find_condition<'a>(
+    scenario: &'a ScenarioDefinition,
+    condition_id: &str,
+) -> Option<&'a ScenarioCondition> {
+    scenario
+        .conditions
+        .iter()
+        .find(|item| item.id == condition_id)
 }
 
 fn find_variant(scenario: &ScenarioDefinition, variant_id: &str) -> Result<ScenarioVariant> {
@@ -99,7 +104,20 @@ fn find_variant(scenario: &ScenarioDefinition, variant_id: &str) -> Result<Scena
         .ok_or_else(|| anyhow::anyhow!("unknown variant `{variant_id}`"))
 }
 
-fn resolve_prompt(scenario: &ScenarioDefinition, variant: Option<&ScenarioVariant>) -> ResolvedPrompt {
+fn select_variant(
+    scenario: &ScenarioDefinition,
+    explicit_variant_id: Option<&str>,
+    condition: Option<&ScenarioCondition>,
+) -> Result<Option<ScenarioVariant>> {
+    let variant_id =
+        explicit_variant_id.or_else(|| condition.and_then(|item| item.variant.as_deref()));
+    variant_id.map(|id| find_variant(scenario, id)).transpose()
+}
+
+fn resolve_prompt(
+    scenario: &ScenarioDefinition,
+    variant: Option<&ScenarioVariant>,
+) -> ResolvedPrompt {
     let mut user = scenario.prompt.user.clone();
     if let Some(suffix) = variant.and_then(|item| item.changes.prompt_suffix.as_deref()) {
         if !user.ends_with('\n') {
@@ -115,3 +133,7 @@ fn resolve_prompt(scenario: &ScenarioDefinition, variant: Option<&ScenarioVarian
         context: scenario.prompt.context.clone(),
     }
 }
+
+#[cfg(test)]
+#[path = "plan_test.rs"]
+mod tests;

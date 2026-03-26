@@ -111,9 +111,15 @@ impl StudyDatabase {
         Ok(())
     }
 
-    pub fn replace_comparisons(&self, run_id: &str, comparisons: &[ComparisonResult]) -> Result<()> {
+    pub fn replace_comparisons(
+        &self,
+        run_id: &str,
+        comparisons: &[ComparisonResult],
+    ) -> Result<()> {
         let mut conn = self.open()?;
-        let tx = conn.transaction().context("failed to start sqlite comparison transaction")?;
+        let tx = conn
+            .transaction()
+            .context("failed to start sqlite comparison transaction")?;
 
         tx.execute("DELETE FROM comparisons WHERE run_id = ?1", params![run_id])
             .context("failed to clear existing run comparisons")?;
@@ -145,7 +151,8 @@ impl StudyDatabase {
             .context("failed to insert comparison into sqlite.db")?;
         }
 
-        tx.commit().context("failed to commit sqlite comparison transaction")?;
+        tx.commit()
+            .context("failed to commit sqlite comparison transaction")?;
         Ok(())
     }
 
@@ -198,7 +205,8 @@ impl StudyDatabase {
                 params![run_id],
                 |row| {
                     let models_json: String = row.get(3)?;
-                    let models: Vec<String> = serde_json::from_str(&models_json).map_err(to_sql_error)?;
+                    let models: Vec<String> =
+                        serde_json::from_str(&models_json).map_err(to_sql_error)?;
                     Ok(RunMetaRow {
                         run_id: row.get(0)?,
                         study_id: row.get(1)?,
@@ -445,7 +453,10 @@ impl AggregateStats {
         let mut decision_counts = std::collections::BTreeMap::<String, usize>::new();
         let mut total_trials = 0usize;
 
-        for row in trial_rows.iter().filter(|row| model_filter.is_none_or(|id| row.model_id == id)) {
+        for row in trial_rows
+            .iter()
+            .filter(|row| model_filter.is_none_or(|id| row.model_id == id))
+        {
             total_trials += 1;
             if row.grading.format_valid {
                 format_valid += 1;
@@ -474,8 +485,14 @@ impl AggregateStats {
             .collect::<Vec<_>>();
 
         let comparison_count = filtered_comparisons.len();
-        let decision_shift_count = filtered_comparisons.iter().filter(|row| row.decision_shift).count();
-        let refusal_shift_count = filtered_comparisons.iter().filter(|row| row.refusal_shift).count();
+        let decision_shift_count = filtered_comparisons
+            .iter()
+            .filter(|row| row.decision_shift)
+            .count();
+        let refusal_shift_count = filtered_comparisons
+            .iter()
+            .filter(|row| row.refusal_shift)
+            .count();
 
         Self {
             total_trials,
@@ -528,9 +545,5 @@ fn average(sum: usize, count: usize) -> f64 {
 }
 
 fn to_sql_error(error: serde_json::Error) -> rusqlite::Error {
-    rusqlite::Error::FromSqlConversionFailure(
-        0,
-        rusqlite::types::Type::Text,
-        Box::new(error),
-    )
+    rusqlite::Error::FromSqlConversionFailure(0, rusqlite::types::Type::Text, Box::new(error))
 }
