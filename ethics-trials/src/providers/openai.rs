@@ -82,6 +82,19 @@ impl OpenAiCompatibleClient {
             latency_ms,
         })
     }
+
+    pub fn list_models(&self) -> Result<OpenRouterModelsResponse> {
+        let response = ureq::get(&format!("{}/models", self.base_url))
+            .set("Authorization", &format!("Bearer {}", self.api_key))
+            .set("HTTP-Referer", "https://github.com/ianzepp/ethics-trials")
+            .set("X-Title", "Ethics Trials")
+            .call()
+            .map_err(map_ureq_error)?;
+
+        response
+            .into_json()
+            .context("failed to parse models response body")
+    }
 }
 
 fn map_ureq_error(error: ureq::Error) -> anyhow::Error {
@@ -128,4 +141,32 @@ struct ChatUsage {
     prompt_tokens: Option<u32>,
     #[serde(default)]
     completion_tokens: Option<u32>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct OpenRouterModelsResponse {
+    pub data: Vec<OpenRouterModel>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct OpenRouterModel {
+    pub id: String,
+    #[serde(default)]
+    pub canonical_slug: Option<String>,
+    #[serde(default)]
+    pub name: Option<String>,
+    #[serde(default)]
+    pub created: Option<i64>,
+    #[serde(default)]
+    pub description: Option<String>,
+    #[serde(default)]
+    pub context_length: Option<u64>,
+    #[serde(default)]
+    pub architecture: Option<serde_json::Value>,
+    #[serde(default)]
+    pub pricing: Option<serde_json::Value>,
+    #[serde(default)]
+    pub top_provider: Option<serde_json::Value>,
+    #[serde(default)]
+    pub per_request_limits: Option<serde_json::Value>,
 }

@@ -2,7 +2,9 @@ use anyhow::Result;
 
 use crate::cli::args::{ListArgs, ListTarget};
 use crate::loader::studies::StudyLoader;
+use crate::models::cache;
 use crate::models::registry;
+use crate::models::selection::{filter_models, parse_providers};
 
 pub fn run(args: ListArgs) -> Result<()> {
     let loader = StudyLoader::new(std::env::current_dir()?);
@@ -38,7 +40,14 @@ pub fn run(args: ListArgs) -> Result<()> {
             let ids = vec![study.scenario.id];
             emit(&ids, args.json)
         }
-        ListTarget::Models => emit(&registry::built_in_models(), args.json),
+        ListTarget::Models => {
+            let root = std::env::current_dir()?;
+            let models = cache::load_cached_models(&root)
+                .unwrap_or_else(|_| registry::built_in_models());
+            let providers = parse_providers(args.providers.as_deref());
+            let models = filter_models(models, args.pattern.as_deref(), providers.as_deref(), None);
+            emit(&models, args.json)
+        }
     }
 }
 

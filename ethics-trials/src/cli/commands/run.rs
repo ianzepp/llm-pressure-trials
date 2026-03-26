@@ -2,8 +2,10 @@ use anyhow::{Result, bail};
 
 use crate::cli::args::RunArgs;
 use crate::loader::studies::StudyLoader;
+use crate::models::cache;
 use crate::loader::validate::validate_study;
 use crate::models::registry;
+use crate::models::selection::{filter_model_ids, filter_models, parse_providers};
 use crate::runner::orchestrator::{
     DryRunSummary, LiveRunSummary, expand_run_request, execute_run_request,
 };
@@ -17,17 +19,51 @@ pub fn run(args: RunArgs) -> Result<()> {
         bail!("--scenario and --experiment are mutually exclusive");
     }
 
+    if !args.model.is_empty() && args.pattern.is_some() {
+        bail!("--model and --pattern are mutually exclusive");
+    }
+
     let loader = StudyLoader::new(std::env::current_dir()?);
     let study = loader.load_study(&args.study)?;
     validate_study(&study)?;
 
-    let requested_models = if args.model.is_empty() {
-        registry::built_in_models()
-            .into_iter()
-            .map(|item| item.id)
-            .collect()
+    let provider_filters = parse_providers(args.providers.as_deref());
+
+    let requested_models = if let Some(pattern) = args.pattern.as_deref() {
+        let root = std::env::current_dir()?;
+        let available_models = cache::load_cached_models(&root)
+            .unwrap_or_else(|_| registry::built_in_models());
+        let matched = filter_models(
+            available_models,
+            Some(pattern),
+            provider_filters.as_deref(),
+            args.limit,
+        )
+        .into_iter()
+        .map(|item| item.id)
+        .collect::<Vec<_>>();
+
+        if matched.is_empty() {
+            bail!("no models matched pattern `{pattern}`");
+        }
+
+        matched
+    } else if args.model.is_empty() {
+        filter_models(
+            registry::built_in_models(),
+            None,
+            provider_filters.as_deref(),
+            args.limit,
+        )
+        .into_iter()
+        .map(|item| item.id)
+        .collect()
     } else {
-        args.model.clone()
+        let filtered = filter_model_ids(args.model.clone(), provider_filters.as_deref(), args.limit);
+        if filtered.is_empty() {
+            bail!("no explicit models remained after provider/limit filtering");
+        }
+        filtered
     };
 
     if args.dry_run {
@@ -50,7 +86,6 @@ pub fn run(args: RunArgs) -> Result<()> {
 
     Ok(())
 }
-
 fn emit_dry_run_summary(summary: &DryRunSummary, json: bool) -> Result<()> {
     if json {
         println!("{}", serde_json::to_string_pretty(summary)?);

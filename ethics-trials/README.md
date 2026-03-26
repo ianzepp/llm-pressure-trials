@@ -7,6 +7,7 @@ The current implementation is centered on:
 - study-local YAML definitions
 - one shared runner for CLI and future TUI use
 - OpenRouter execution through an OpenAI-compatible client adapter
+- cached OpenRouter model catalog under `.cache/`
 - durable JSON artifacts
 - per-study SQLite indexing
 
@@ -21,6 +22,7 @@ Implemented today:
 - deterministic normalization and grading for `simple-mercy`
 - study-local artifact writing under `studies/<study>/runs/<run-id>/`
 - study-local SQLite index at `studies/<study>/sqlite.db`
+- OpenRouter model catalog sync into `.cache/openrouter/models.json`
 - run reporting from SQLite
 
 Not implemented yet:
@@ -51,6 +53,9 @@ cargo check
 
 ```text
 ethics-trials/
+├── .cache/
+│   └── openrouter/
+│       └── models.json
 ├── studies/
 │   └── simple-mercy/
 │       ├── scenario.yml
@@ -105,11 +110,59 @@ List rubrics for one study:
 cargo run -- list rubrics --study simple-mercy
 ```
 
-List built-in model targets:
+List available model targets:
 
 ```bash
 cargo run -- list models
 ```
+
+List models as JSON:
+
+```bash
+cargo run -- list models --json
+```
+
+Filter cached models by full `provider/model` pattern:
+
+```bash
+cargo run -- list models --pattern 'openai/gpt-5*'
+```
+
+Filter by provider namespace:
+
+```bash
+cargo run -- list models --providers openai,anthropic
+```
+
+Combine provider and pattern filters:
+
+```bash
+cargo run -- list models \
+  --providers openai \
+  --pattern 'openai/gpt-5*'
+```
+
+### Sync the OpenRouter model catalog
+
+Fetch the current OpenRouter model catalog into the local cache:
+
+```bash
+cargo run -- sync
+```
+
+JSON output:
+
+```bash
+cargo run -- sync --json
+```
+
+This writes:
+
+```text
+.cache/openrouter/models.json
+```
+
+`list models` prefers this cache when present and falls back to the small built-in list otherwise.
 
 ### Dry-run an experiment
 
@@ -133,6 +186,45 @@ cargo run -- run \
   --dry-run \
   --json
 ```
+
+Dry-run across every cached model matching a `provider/model` pattern:
+
+```bash
+cargo run -- run \
+  --study simple-mercy \
+  --experiment mercy-format-stability \
+  --pattern 'openai/*' \
+  --dry-run
+```
+
+Limit the matched model set before expansion:
+
+```bash
+cargo run -- run \
+  --study simple-mercy \
+  --experiment mercy-format-stability \
+  --pattern 'openai/*' \
+  --limit 3 \
+  --dry-run
+```
+
+Filter by provider namespace and pattern together:
+
+```bash
+cargo run -- run \
+  --study simple-mercy \
+  --experiment mercy-format-stability \
+  --providers openai \
+  --pattern 'openai/gpt-5*' \
+  --limit 5 \
+  --dry-run
+```
+
+Rules:
+
+- `--model` and `--pattern` are mutually exclusive
+- `--providers` filters the namespace before the slash in ids like `openai/gpt-5-mini`
+- `--limit` truncates the selected model list before trial expansion
 
 ### Execute a live run
 
@@ -222,20 +314,25 @@ cargo run -- validate all --study simple-mercy
 # 2. Inspect the available experiment
 cargo run -- list experiments --study simple-mercy
 
-# 3. Dry-run the ABAB expansion
+# 3. Sync the OpenRouter model catalog
+cargo run -- sync
+
+# 4. Dry-run the ABAB expansion
 cargo run -- run \
   --study simple-mercy \
   --experiment mercy-format-stability \
-  --model openai/gpt-4o-mini \
+  --providers openai \
+  --pattern 'openai/gpt-5*' \
+  --limit 3 \
   --dry-run
 
-# 4. Execute the live run
+# 5. Execute the live run
 cargo run -- run \
   --study simple-mercy \
   --experiment mercy-format-stability \
   --model openai/gpt-4o-mini
 
-# 5. Summarize the latest run from SQLite
+# 6. Summarize the latest run from SQLite
 cargo run -- report --study simple-mercy
 ```
 

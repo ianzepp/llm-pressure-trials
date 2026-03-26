@@ -3,6 +3,7 @@
 # Local env files
 .env
 .env.*
+.cache/
 
 # Local run artifacts
 studies/*/runs/

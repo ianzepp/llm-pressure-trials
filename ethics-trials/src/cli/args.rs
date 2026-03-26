@@ -20,6 +20,7 @@ pub enum Command {
     Validate(ValidateArgs),
     Run(RunArgs),
     Report(ReportArgs),
+    Sync(SyncArgs),
 }
 
 #[derive(Debug, Args)]
@@ -28,6 +29,10 @@ pub struct ListArgs {
     pub target: ListTarget,
     #[arg(long)]
     pub study: Option<String>,
+    #[arg(long)]
+    pub pattern: Option<String>,
+    #[arg(long)]
+    pub providers: Option<String>,
     #[arg(long)]
     pub json: bool,
 }
@@ -67,6 +72,12 @@ pub struct RunArgs {
     #[arg(long)]
     pub model: Vec<String>,
     #[arg(long)]
+    pub pattern: Option<String>,
+    #[arg(long)]
+    pub providers: Option<String>,
+    #[arg(long)]
+    pub limit: Option<usize>,
+    #[arg(long)]
     pub json: bool,
     #[arg(long)]
     pub dry_run: bool,
@@ -78,6 +89,12 @@ pub struct ReportArgs {
     pub study: String,
     #[arg(long)]
     pub run_id: Option<String>,
+    #[arg(long)]
+    pub json: bool,
+}
+
+#[derive(Debug, Args)]
+pub struct SyncArgs {
     #[arg(long)]
     pub json: bool,
 }
