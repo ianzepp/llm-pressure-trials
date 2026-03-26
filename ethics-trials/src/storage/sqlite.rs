@@ -83,9 +83,11 @@ impl StudyDatabase {
                 response_content, tokens_in, tokens_out, latency_ms,
                 normalized_json, grading_json, prompt_json, repetition_index,
                 coercion_content, coercion_normalized_json, coercion_grading_json,
-                coercion_tokens_in, coercion_tokens_out, coercion_latency_ms
+                coercion_tokens_in, coercion_tokens_out, coercion_latency_ms,
+                escalation_content, escalation_normalized_json, escalation_grading_json,
+                escalation_tokens_in, escalation_tokens_out, escalation_latency_ms
             ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13,
-                      ?14, ?15, ?16, ?17, ?18, ?19)
+                      ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22, ?23, ?24, ?25)
             ON CONFLICT(run_id, trial_id) DO UPDATE SET
                 model_id = excluded.model_id,
                 condition_label = excluded.condition_label,
@@ -103,7 +105,13 @@ impl StudyDatabase {
                 coercion_grading_json = excluded.coercion_grading_json,
                 coercion_tokens_in = excluded.coercion_tokens_in,
                 coercion_tokens_out = excluded.coercion_tokens_out,
-                coercion_latency_ms = excluded.coercion_latency_ms
+                coercion_latency_ms = excluded.coercion_latency_ms,
+                escalation_content = excluded.escalation_content,
+                escalation_normalized_json = excluded.escalation_normalized_json,
+                escalation_grading_json = excluded.escalation_grading_json,
+                escalation_tokens_in = excluded.escalation_tokens_in,
+                escalation_tokens_out = excluded.escalation_tokens_out,
+                escalation_latency_ms = excluded.escalation_latency_ms
             "#,
             params![
                 run_id,
@@ -125,6 +133,12 @@ impl StudyDatabase {
                 result.coercion_response.as_ref().and_then(|r| r.tokens_in.map(i64::from)),
                 result.coercion_response.as_ref().and_then(|r| r.tokens_out.map(i64::from)),
                 result.coercion_response.as_ref().map(|r| r.latency_ms as i64),
+                result.escalation_response.as_ref().map(|r| r.content.clone()),
+                result.escalation_normalized.as_ref().map(|n| serde_json::to_string(n)).transpose()?,
+                result.escalation_grading.as_ref().map(|g| serde_json::to_string(g)).transpose()?,
+                result.escalation_response.as_ref().and_then(|r| r.tokens_in.map(i64::from)),
+                result.escalation_response.as_ref().and_then(|r| r.tokens_out.map(i64::from)),
+                result.escalation_response.as_ref().map(|r| r.latency_ms as i64),
             ],
         )
         .context("failed to insert trial result into sqlite.db")?;
@@ -293,7 +307,8 @@ impl StudyDatabase {
         let mut stmt = conn.prepare(
             r#"
             SELECT model_id, normalized_json, grading_json, tokens_in, tokens_out, latency_ms,
-                   condition_label, coercion_grading_json, coercion_normalized_json
+                   condition_label, coercion_grading_json, coercion_normalized_json,
+                   escalation_grading_json, escalation_normalized_json
             FROM trial_results
             WHERE run_id = ?1
             ORDER BY model_id, trial_id
@@ -305,6 +320,8 @@ impl StudyDatabase {
                 let grading_json: String = row.get(2)?;
                 let coercion_grading_json: Option<String> = row.get(7)?;
                 let coercion_normalized_json: Option<String> = row.get(8)?;
+                let escalation_grading_json: Option<String> = row.get(9)?;
+                let escalation_normalized_json: Option<String> = row.get(10)?;
                 Ok(TrialReportRow {
                     model_id: row.get(0)?,
                     normalized: serde_json::from_str(&normalized_json).map_err(to_sql_error)?,
@@ -318,6 +335,16 @@ impl StudyDatabase {
                         .map(|s| serde_json::from_str(s).map_err(to_sql_error))
                         .transpose()?,
                     coercion_decision: coercion_normalized_json
+                        .as_deref()
+                        .and_then(|s| match serde_json::from_str::<StoredNormalized>(s) {
+                            Ok(n) => n.decision,
+                            Err(_) => None,
+                        }),
+                    escalation_grading: escalation_grading_json
+                        .as_deref()
+                        .map(|s| serde_json::from_str(s).map_err(to_sql_error))
+                        .transpose()?,
+                    escalation_decision: escalation_normalized_json
                         .as_deref()
                         .and_then(|s| match serde_json::from_str::<StoredNormalized>(s) {
                             Ok(n) => n.decision,
@@ -498,6 +525,12 @@ impl StudyDatabase {
         ensure_column(&conn, "trial_results", "coercion_tokens_in", "INTEGER")?;
         ensure_column(&conn, "trial_results", "coercion_tokens_out", "INTEGER")?;
         ensure_column(&conn, "trial_results", "coercion_latency_ms", "INTEGER")?;
+        ensure_column(&conn, "trial_results", "escalation_content", "TEXT")?;
+        ensure_column(&conn, "trial_results", "escalation_normalized_json", "TEXT")?;
+        ensure_column(&conn, "trial_results", "escalation_grading_json", "TEXT")?;
+        ensure_column(&conn, "trial_results", "escalation_tokens_in", "INTEGER")?;
+        ensure_column(&conn, "trial_results", "escalation_tokens_out", "INTEGER")?;
+        ensure_column(&conn, "trial_results", "escalation_latency_ms", "INTEGER")?;
 
         Ok(())
     }
@@ -543,6 +576,8 @@ pub struct AggregateStats {
     pub refusal_shift_count: usize,
     pub coercion_attempts: usize,
     pub coercion_overrides: usize,
+    pub escalation_attempts: usize,
+    pub escalation_refusals: usize,
     pub judged_count: usize,
     pub judged_decision_counts: Vec<(String, usize)>,
     pub judged_compliance_counts: Vec<(String, usize)>,
@@ -579,6 +614,8 @@ struct TrialReportRow {
     latency_ms: i64,
     coercion_grading: Option<StoredGrading>,
     coercion_decision: Option<String>,
+    escalation_grading: Option<StoredGrading>,
+    escalation_decision: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -646,6 +683,8 @@ impl AggregateStats {
         let mut cost_sum = 0.0f64;
         let mut coercion_attempts = 0usize;
         let mut coercion_overrides = 0usize;
+        let mut escalation_attempts = 0usize;
+        let mut escalation_refusals = 0usize;
         let mut judged_count = 0usize;
         let mut judged_decisions = std::collections::BTreeMap::<String, usize>::new();
         let mut judged_compliances = std::collections::BTreeMap::<String, usize>::new();
@@ -702,6 +741,13 @@ impl AggregateStats {
                 }
             }
 
+            if let Some(eg) = &row.escalation_grading {
+                escalation_attempts += 1;
+                if eg.refusal_present {
+                    escalation_refusals += 1;
+                }
+            }
+
             if let Some(jd) = &row.grading.judge_decision {
                 judged_count += 1;
                 *judged_decisions.entry(jd.clone()).or_insert(0) += 1;
@@ -739,6 +785,8 @@ impl AggregateStats {
             refusal_shift_count,
             coercion_attempts,
             coercion_overrides,
+            escalation_attempts,
+            escalation_refusals,
             judged_count,
             judged_decision_counts: judged_decisions.into_iter().collect(),
             judged_compliance_counts: judged_compliances.into_iter().collect(),

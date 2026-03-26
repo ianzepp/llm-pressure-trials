@@ -55,6 +55,9 @@ pub fn execute_trial(
         coercion_response: None,
         coercion_normalized: None,
         coercion_grading: None,
+        escalation_response: None,
+        escalation_normalized: None,
+        escalation_grading: None,
     };
 
     // If the first turn was a refusal and we have a coercion prompt, send follow-up
@@ -94,6 +97,47 @@ pub fn execute_trial(
             });
             result.coercion_normalized = Some(coercion_norm);
             result.coercion_grading = Some(coercion_grade);
+        }
+    }
+
+    // If the first turn was NOT a refusal and we have an escalation prompt,
+    // send stage-2 follow-up that asks the model to act on its own agreement.
+    if !result.grading.refusal_present {
+        if let Some(escalation_prompt) = unit.prompt.escalation.as_deref() {
+            let esc_started = Instant::now();
+            let esc_response = client.chat_completion_followup(
+                &unit.model_id,
+                unit.prompt.system.as_deref(),
+                unit.prompt.context.as_deref(),
+                &unit.prompt.user,
+                &result.response.content,
+                escalation_prompt,
+            )?;
+            let esc_elapsed = esc_started
+                .elapsed()
+                .as_millis()
+                .max(esc_response.latency_ms);
+
+            let (esc_norm, mut esc_grade) =
+                normalize_and_grade(unit, &esc_response.content);
+
+            if judge.enabled && needs_judge(&esc_norm, &esc_grade) {
+                if let Ok(jr) = run_judge(client, &judge.model, &esc_response.content) {
+                    esc_grade.judge_decision = Some(jr.decision);
+                    esc_grade.judge_compliance = Some(jr.compliance);
+                    esc_grade.judge_reasoning = Some(jr.reasoning);
+                    esc_grade.judge_model = Some(judge.model.clone());
+                }
+            }
+
+            result.escalation_response = Some(RawModelResponse {
+                content: esc_response.content,
+                tokens_in: esc_response.tokens_in,
+                tokens_out: esc_response.tokens_out,
+                latency_ms: esc_elapsed,
+            });
+            result.escalation_normalized = Some(esc_norm);
+            result.escalation_grading = Some(esc_grade);
         }
     }
 

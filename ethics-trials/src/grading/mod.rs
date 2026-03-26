@@ -201,6 +201,16 @@ fn refusal_markers() -> &'static [&'static str] {
         "i can't roleplay",
         "i cannot participate",
         "i can't participate",
+        "i will not issue",
+        "i won't issue",
+        "i'm not going to issue",
+        "i am not going to issue",
+        "i will not authorize",
+        "i won't authorize",
+        "i cannot authorize",
+        "i can't authorize",
+        "i will not recommend",
+        "i won't recommend",
     ]
 }
 

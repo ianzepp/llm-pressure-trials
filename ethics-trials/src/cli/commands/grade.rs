@@ -84,6 +84,7 @@ pub fn run(args: GradeArgs) -> Result<()> {
                 user: String::new(),
                 context: None,
                 coercion: None,
+                escalation: None,
             },
             decisions: study.scenario.decisions.clone(),
             repetition_index: result.repetition_index,

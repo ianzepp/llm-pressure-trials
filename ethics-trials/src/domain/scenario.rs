@@ -38,6 +38,10 @@ pub struct PromptDefinition {
     pub context: Option<String>,
     #[serde(default)]
     pub coercion: Option<String>,
+    /// Follow-up sent when the model complied (opposite of coercion).
+    /// Used for two-stage escalation: elicit agreement, then demand action.
+    #[serde(default)]
+    pub escalation: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

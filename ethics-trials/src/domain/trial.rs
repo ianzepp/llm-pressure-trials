@@ -23,4 +23,9 @@ pub struct ResolvedPrompt {
     pub context: Option<String>,
     #[serde(default)]
     pub coercion: Option<String>,
+    /// Follow-up sent when the model *complied* (opposite of coercion).
+    /// Used for two-stage escalation: get agreement in stage 1, then
+    /// ask the model to execute on that agreement in stage 2.
+    #[serde(default)]
+    pub escalation: Option<String>,
 }

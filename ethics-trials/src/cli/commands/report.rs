@@ -91,6 +91,14 @@ fn print_stats(stats: &AggregateStats, indent: &str) {
             pct(stats.coercion_overrides, stats.coercion_attempts)
         );
     }
+    if stats.escalation_attempts > 0 {
+        println!(
+            "{indent}escalation: {} attempts, {} refused on execution ({:.1}%)",
+            stats.escalation_attempts,
+            stats.escalation_refusals,
+            pct(stats.escalation_refusals, stats.escalation_attempts)
+        );
+    }
     if stats.judged_count > 0 {
         println!(
             "{indent}judged: {} ({:.1}%) — decisions: {}, compliance: {}",

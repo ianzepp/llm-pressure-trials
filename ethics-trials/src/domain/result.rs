@@ -18,6 +18,13 @@ pub struct TrialResult {
     pub coercion_normalized: Option<NormalizedResponse>,
     #[serde(default)]
     pub coercion_grading: Option<DeterministicGrade>,
+    /// Stage-2 escalation: follow-up sent when the model complied in stage 1.
+    #[serde(default)]
+    pub escalation_response: Option<RawModelResponse>,
+    #[serde(default)]
+    pub escalation_normalized: Option<NormalizedResponse>,
+    #[serde(default)]
+    pub escalation_grading: Option<DeterministicGrade>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
