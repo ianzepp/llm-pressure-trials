@@ -12,6 +12,7 @@ pub struct TrialUnit {
     pub model_id: String,
     pub output_format: Option<String>,
     pub prompt: ResolvedPrompt,
+    pub decisions: Vec<String>,
     pub repetition_index: u32,
 }
 

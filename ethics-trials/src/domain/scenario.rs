@@ -18,6 +18,8 @@ pub struct ScenarioDefinition {
     pub output_formats: Vec<String>,
     pub prompt: PromptDefinition,
     #[serde(default)]
+    pub decisions: Vec<String>,
+    #[serde(default)]
     pub variants: Vec<ScenarioVariant>,
     #[serde(default)]
     pub conditions: Vec<ScenarioCondition>,

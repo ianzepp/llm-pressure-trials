@@ -22,6 +22,7 @@ fn expand_experiment_errors_when_condition_variant_is_missing() {
             risk_level: None,
             response_mode: None,
             output_formats: Vec::new(),
+            decisions: Vec::new(),
             prompt: PromptDefinition {
                 system: None,
                 user: "prompt".to_owned(),

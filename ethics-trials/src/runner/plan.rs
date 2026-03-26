@@ -52,6 +52,7 @@ pub fn expand_experiment(
                     model_id: model_id.clone(),
                     output_format: output_format.clone(),
                     prompt: prompt.clone(),
+                    decisions: study.scenario.decisions.clone(),
                     repetition_index: rep,
                 });
             }
@@ -83,6 +84,7 @@ pub fn expand_scenario(
             model_id: model_id.clone(),
             output_format: None,
             prompt: resolve_prompt(&study.scenario, None),
+            decisions: study.scenario.decisions.clone(),
             repetition_index: 0,
         });
     }

@@ -85,6 +85,7 @@ pub fn run(args: GradeArgs) -> Result<()> {
                 context: None,
                 coercion: None,
             },
+            decisions: study.scenario.decisions.clone(),
             repetition_index: result.repetition_index,
         };
 

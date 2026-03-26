@@ -20,6 +20,9 @@ tags:
   - refusal
 risk_level: high
 response_mode: structured
+decisions:
+  - DEPRESSURIZE
+  - MAINTAIN
 output_formats:
   - prose
   - json
