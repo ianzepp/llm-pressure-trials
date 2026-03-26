@@ -65,20 +65,22 @@ It is meant to be reusable for other high-stakes decision scenarios later.
 
 ## Why This Study Exists First
 
-This package is the first concrete study because it gives the project:
+This package is the first substantive behavioral study in the working repository.
 
-- one scenario
+It gives the project:
+
+- one severe scenario
 - one ABAB experiment
-- one behavioral rubric
-- one study-local package layout
+- one rubric
+- one study-local artifact tree
 
-That makes it a good seed for:
+That makes it the main proving ground for:
 
-- loader development
-- runner development
+- loader behavior
+- runner behavior
+- deterministic grading
 - artifact design
-- CLI targeting
-- TUI selection flows
+- SQLite reporting
 
 ## File Layout
 
@@ -88,15 +90,11 @@ simple-mercy/
 ├── scenario.yml
 ├── experiments/
 │   └── mercy-format-stability.yml
-└── rubrics/
-    └── refusal-compliance-stability.yml
+├── rubrics/
+│   └── refusal-compliance-stability.yml
+├── runs/
+└── sqlite.db
 ```
-
-As the study grows, it may also include:
-
-- `fixtures/`
-- `runs/`
-- `results/`
 
 ## Intended Questions
 
@@ -112,9 +110,11 @@ Examples of the questions this study should eventually answer:
 
 Current status:
 
-- scenario defined
-- experiment defined
-- rubric defined
-- runner not yet implemented
+- scenario implemented
+- experiment implemented
+- rubric loaded and validated
+- runner execution working
+- run artifacts written under `runs/`
+- run summaries queryable through `sqlite.db`
 
-This package is a design anchor for the first executable version of `ethics-trials`.
+This package is no longer just a design anchor. It is an actively executable study.

@@ -15,13 +15,14 @@ The current implementation is centered on:
 
 Implemented today:
 
-- Rust CLI scaffold
+- Rust CLI with `list`, `validate`, `run`, `report`, and `sync`
 - study loading and validation
-- experiment expansion into concrete trial units
-- live serial execution against OpenRouter
-- deterministic normalization and grading for `simple-mercy`
+- experiment and scenario expansion into concrete trial units
+- bounded execution controls with launch pacing and high/low watermarks
+- live execution against OpenRouter
+- deterministic normalization and grading for `simple-mercy` and `smoke-latency`
 - study-local artifact writing under `studies/<study>/runs/<run-id>/`
-- study-local SQLite index at `studies/<study>/sqlite.db`
+- study-local SQLite indexes at `studies/<study>/sqlite.db`
 - OpenRouter model catalog sync into `.cache/openrouter/models.json`
 - run reporting from SQLite
 - baseline unit coverage for runner/provider correctness edges
@@ -29,9 +30,9 @@ Implemented today:
 
 Not implemented yet:
 
-- bounded parallel execution
 - replay
 - TUI
+- direct artifact retrieval commands
 - richer rubric-driven grading beyond the current deterministic first pass
 
 ## Requirements
@@ -69,10 +70,15 @@ ethics-trials/
 │   └── openrouter/
 │       └── models.json
 ├── studies/
-│   └── simple-mercy/
+│   ├── simple-mercy/
+│   │   ├── scenario.yml
+│   │   ├── experiments/
+│   │   ├── rubrics/
+│   │   ├── runs/
+│   │   └── sqlite.db
+│   └── smoke-latency/
 │       ├── scenario.yml
 │       ├── experiments/
-│       ├── rubrics/
 │       ├── runs/
 │       └── sqlite.db
 ├── schemas/
@@ -260,6 +266,7 @@ Files currently written:
 - `run.json`
 - `trial_units.json`
 - `trial_results.jsonl`
+- `trial_failures.jsonl` when failures occur
 - `comparisons.json`
 - `summary.json`
 
@@ -306,7 +313,7 @@ The report currently includes:
 
 The current grading layer is intentionally narrow and deterministic.
 
-For `simple-mercy`, it currently tracks:
+For the current studies, it tracks:
 
 - strict JSON validity
 - refusal marker detection
@@ -316,6 +323,23 @@ For `simple-mercy`, it currently tracks:
 - harmful specificity
 
 This is enough for a first behavioral pass, but it is not yet a full rubric engine.
+
+## Implemented Commands
+
+The binary currently supports:
+
+- `list`
+- `validate`
+- `run`
+- `report`
+- `sync`
+
+It does not yet support:
+
+- `tui`
+- `replay`
+- `get`
+- `list runs`
 
 ## Example End-To-End Flow
 

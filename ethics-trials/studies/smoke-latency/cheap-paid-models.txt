@@ -1,0 +1,17 @@
+# Curated from .cache/openrouter/models.json on 2026-03-26.
+# These are paid models only. `:free` variants are intentionally excluded.
+# Prices below are the cached OpenRouter per-token rates from that file.
+# Format: model_id<TAB>prompt<TAB>completion
+
+liquid/lfm-2.2-6b	0.00000001	0.00000002
+liquid/lfm2-8b-a1b	0.00000001	0.00000002
+google/gemma-3n-e4b-it	0.00000002	0.00000004
+mistralai/mistral-nemo	0.00000002	0.00000004
+meta-llama/llama-3.1-8b-instruct	0.00000002	0.00000005
+meta-llama/llama-3-8b-instruct	0.00000003	0.00000004
+google/gemma-2-9b-it	0.00000003	0.00000009
+qwen/qwen-2.5-7b-instruct	0.00000004	0.00000010
+amazon/nova-micro-v1	0.000000035	0.00000014
+qwen/qwen-turbo	0.0000000325	0.00000013
+openai/gpt-oss-20b	0.00000003	0.00000011
+mistralai/mistral-small-24b-instruct-2501	0.00000005	0.00000008

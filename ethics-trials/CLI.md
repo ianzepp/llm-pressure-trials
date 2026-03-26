@@ -1,373 +1,185 @@
-# CLI Direction
+# CLI
 
-## Goal
+## Current Surface
 
-`ethics-trials` should expose a first-class CLI for launching, inspecting, replaying, and reporting behavioral experiments without requiring the terminal UI.
+`ethics-trials` currently exposes five commands:
 
-This CLI is required for:
+- `list`
+- `validate`
+- `run`
+- `report`
+- `sync`
 
-- automation
-- scripting
-- CI
-- reproducible batch runs
-- direct use by another LLM or agent
+There is no implemented `tui`, `replay`, `get`, or `list runs` command yet.
 
-The CLI is not a secondary fallback. It is one of the primary interfaces to the system.
+The CLI is the only production frontend today.
 
-## Design Rule
-
-The CLI and the TUI must both sit on top of the same execution engine.
-
-That means:
-
-- same runner
-- same scenario loading
-- same model resolution
-- same parallel execution
-- same grading
-- same artifact writing
-
-The CLI must not be a separate implementation with different semantics.
-
-## Core Principles
-
-- explicit commands over hidden defaults
-- machine-usable output where appropriate
-- deterministic exit behavior
-- stable argument surfaces
-- compatibility with both human operators and LLM-driven invocation
-
-## Primary Command Surface
-
-The CLI should have a compact but capable surface.
-
-### `ethics-trials tui`
-
-Launch the interactive terminal UI.
-
-Purpose:
-
-- human-operated scenario selection
-- model selection
-- live run monitoring
-
-### `ethics-trials run`
-
-Run a scenario or experiment directly.
-
-Purpose:
-
-- batch execution
-- scripted execution
-- agent-driven execution
-
-The `run` command should become the main automation entrypoint.
-
-It should support study-scoped execution so a single named directory can own:
-
-- scenario definition
-- experiment definitions
-- rubric definitions
-- run artifacts
-- result artifacts
-
-### `ethics-trials replay`
-
-Replay or re-grade a previous run using stored artifacts.
-
-Purpose:
-
-- rubric evolution
-- grader evolution
-- regression analysis
-
-### `ethics-trials report`
-
-Summarize a prior run or a set of runs.
-
-Purpose:
-
-- quick inspection
-- aggregate behavioral reporting
-- machine-readable summaries
-
-### `ethics-trials get`
-
-Open a stored run artifact or a single case result.
-
-Purpose:
-
-- direct artifact retrieval
-- agent inspection of prior outputs
+## Command Reference
 
 ### `ethics-trials list`
 
-List available project objects.
+Lists one class of project objects.
 
-Subcommands should include:
+Supported targets:
 
-- `list scenarios`
-- `list experiments`
-- `list models`
-- `list rubrics`
-- `list runs`
+- `studies`
+- `scenarios`
+- `experiments`
+- `rubrics`
+- `models`
+
+Current behavior:
+
+- `list studies` discovers study directories under `studies/`
+- `list scenarios --study <id>` returns the single scenario id for that study
+- `list experiments --study <id>` returns experiment ids from `studies/<id>/experiments/`
+- `list rubrics --study <id>` returns rubric ids from `studies/<id>/rubrics/`
+- `list models` prefers `.cache/openrouter/models.json` and falls back to the small built-in model list
+
+Options:
+
+- `--study <STUDY>`
+- `--pattern <PATTERN>`
+- `--providers <PROVIDERS>`
+- `--json`
 
 ### `ethics-trials validate`
 
-Validate project definitions.
+Validates study definitions and reference integrity.
 
-Subcommands should include:
+Current target set:
 
-- `validate scenario <id>`
-- `validate experiment <id>`
-- `validate rubric <id>`
 - `validate all`
 
-## The `run` Command
+Current behavior:
 
-This is the most important command for LLM use.
+- with `--study <id>`, validates one study
+- without `--study`, validates every discovered study
+- prints one `study: ok` line per validated study unless `--json` is used
 
-It should support:
+Options:
 
-- selecting a scenario directly
-- selecting an experiment directly
-- selecting one or more models
-- selecting output format or condition variants
-- selecting live or fixture-backed execution
-- controlling concurrency
-- controlling output formatting
-
-### Minimum Inputs
-
-At least one of:
-
-- `--scenario <id>`
-- `--experiment <id>`
-
-And one of:
-
-- `--model <id>`
-- `--models <id1,id2,...>`
-- `--models-file <path>`
-
-### Useful Flags
-
-Recommended flags:
-
-- `--study <id>`
-- `--scenario <id>`
-- `--experiment <id>`
-- `--model <id>`
-- `--models <comma-separated>`
-- `--models-file <path>`
-- `--provider <id>`
-- `--output-format <id>`
-- `--variant <id>`
-- `--parallel`
-- `--max-parallel <n>`
-- `--fixture <name>`
-- `--live`
-- `--output <path>`
+- `--study <STUDY>`
 - `--json`
-- `--no-tui`
+
+### `ethics-trials run`
+
+Runs one scenario or one experiment within a study.
+
+Required:
+
+- `--study <STUDY>`
+- exactly one of `--scenario <SCENARIO>` or `--experiment <EXPERIMENT>`
+
+Model selection:
+
+- one or more `--model <MODEL>`
+- or `--pattern <PATTERN>`
+- optional `--providers <PROVIDERS>`
+- optional `--limit <LIMIT>`
+
+Execution options:
+
+- `--launch-interval-ms <N>`
+- `--high-water <N>`
+- `--low-water <N>`
+- `--continue-on-error`
 - `--dry-run`
+- `--json`
+- `--jsonl`
 
-The exact list can change, but this is the right class of interface.
+Current behavior:
 
-### Study Resolution
+- `--dry-run` expands trial units without calling the provider
+- live runs use the shared runner and write artifacts under `studies/<study>/runs/<run-id>/`
+- live runs update the study-local SQLite index at `studies/<study>/sqlite.db`
+- `--jsonl` streams runner events during live execution only
+- `--json` prints the dry-run summary or final live-run summary
 
-For scalability, the CLI should support a study-first lookup model.
+Constraint rules enforced today:
 
-Examples:
+- `--scenario` and `--experiment` are mutually exclusive
+- `--model` and `--pattern` are mutually exclusive
+- `--json` and `--jsonl` are mutually exclusive
+- `--jsonl` is rejected for dry runs
+- `--low-water` must be less than `--high-water`
 
-- `ethics-trials run --study simple-mercy --scenario scenario`
-- `ethics-trials run --study simple-mercy --experiment mercy-format-stability`
-- `ethics-trials report --study simple-mercy --run-id ...`
+### `ethics-trials report`
 
-This allows a study directory such as `studies/simple-mercy/` to contain all
-related definitions and artifacts.
+Builds a summary from the study-local SQLite index.
 
-## Agent-Friendly Requirements
+Required:
 
-If another LLM is going to use this CLI, the CLI must be predictable.
+- `--study <STUDY>`
 
-That means:
+Optional:
 
-- exit code `0` on success
-- nonzero exit code on validation or execution failure
-- optional JSON output for machine consumption
-- commands that can discover project state before execution
-- no need to scrape colorful human-only terminal output
+- `--run-id <RUN_ID>`
+- `--json`
 
-Important agent-oriented commands:
+Current behavior:
 
-- `ethics-trials list scenarios --json`
-- `ethics-trials list experiments --json`
-- `ethics-trials list models --json`
-- `ethics-trials run ... --json`
-- `ethics-trials report --run-id <id> --json`
-- `ethics-trials get <path> --json`
+- with `--run-id`, reports that run
+- without `--run-id`, reports the latest run in the study
+- aggregate output includes trial counts, format-valid counts, refusal counts, compliance buckets, decision buckets, average hedging, average harmful specificity, and comparison totals
+- per-model output includes the same counters scoped to one model id
+
+### `ethics-trials sync`
+
+Refreshes the cached OpenRouter model catalog.
+
+Options:
+
+- `--json`
+
+Current behavior:
+
+- fetches the model list through the OpenRouter-compatible client
+- writes `.cache/openrouter/models.json`
+- prints cache path, model count, and sync timestamp unless `--json` is used
 
 ## Output Modes
 
-The CLI should support at least two output modes.
+The current CLI supports two machine-usable output styles:
 
-### Human Output
+- `--json` for structured summaries from `list`, `validate`, `run`, `report`, and `sync`
+- `--jsonl` for live `run` event streaming
 
-Readable terminal output for operators.
+Human-readable text output remains the default.
 
-Includes:
+## Runner Relationship
 
-- concise progress
-- run summary
-- failure details
-- result location
+The CLI does not implement its own execution logic.
 
-### JSON Output
+Today it shares:
 
-Structured output for automation and LLM use.
-
-Should be available via `--json`.
-
-This should expose:
-
-- run id
-- selected scenario or experiment
-- selected models
-- status
-- output artifact path
-- pass/fail or analysis summary
-- error metadata when relevant
-
-## Parallel Execution
-
-The CLI must be able to launch parallel runs directly.
-
-This is especially important for:
-
-- large model sweeps
-- repeated experiments
-- agent-directed experimentation
-
-Requirements:
-
-- bounded concurrency
-- provider-aware key pools
-- per-key leasing
-- progress reporting even in non-TUI mode
-
-The critical design constraint is:
-
-Parallel execution must not depend on the TUI being active.
-
-The same parallel runner should work for:
-
-- `ethics-trials run --json`
-- `ethics-trials run --no-tui`
-- `ethics-trials tui`
-
-## Replay and Reporting
-
-The CLI should make artifact reuse easy.
-
-### Replay
-
-Examples:
-
-- replay an entire run
-- replay using current graders
-- compare original pass/fail vs replayed pass/fail
-
-### Report
-
-Examples:
-
-- summarize one run
-- summarize all runs for a scenario
-- summarize behavior by model family
-- summarize ABAB deltas
-
-These commands should become the non-interactive analysis surface.
-
-## Example Command Shapes
-
-These are directional examples, not final syntax.
-
-### Run One Scenario Across Multiple Models
-
-```bash
-ethics-trials run \
-  --study simple-mercy \
-  --scenario mercy/simple-mercy-json \
-  --models openrouter/claude-haiku,openrouter/gpt-5-mini,openrouter/grok-3-mini \
-  --parallel
-```
-
-### Run One Experiment
-
-```bash
-ethics-trials run \
-  --study simple-mercy \
-  --experiment abab/authority-mercy-sweep \
-  --models-file config/model_sets/high-risk.yml \
-  --parallel \
-  --json
-```
-
-### List Available Scenarios
-
-```bash
-ethics-trials list scenarios --json
-```
-
-### Report A Prior Run
-
-```bash
-ethics-trials report --run-id run-2026-03-26-001 --json
-```
-
-### Replay A Prior Run
-
-```bash
-ethics-trials replay --run-id run-2026-03-26-001
-```
-
-## Recommended Internal Separation
-
-The CLI layer should do only:
-
-- argument parsing
-- command dispatch
-- output formatting
-
-The runner layer should do:
-
-- loading
-- expansion
-- execution
-- grading
+- study loading
+- validation
+- experiment and scenario expansion
+- provider execution
+- deterministic grading
 - artifact writing
+- SQLite indexing
 
-This separation will keep the CLI stable and make it safe for agents to use.
+with the same runner modules a future TUI would need to call.
 
-## V1 CLI Priorities
+## Implemented vs Planned
 
-The first useful version only needs:
+Implemented now:
 
-- `tui`
-- `run`
-- `list scenarios`
-- `list models`
-- `report`
-- `replay`
+- CLI-first workflow
+- study-scoped lookup
+- dry-run expansion
+- live execution
+- bounded scheduler controls
+- JSON and JSONL outputs
+- run reporting from SQLite
+- model catalog syncing
 
-That is enough to support both human and LLM workflows.
+Planned but not implemented:
 
-## Standard For Success
-
-The CLI is good enough when:
-
-- a human can run a scenario sweep without touching code
-- an LLM can discover scenarios and models, launch a run, and inspect results
-- parallel execution works the same way with or without the TUI
-- prior runs can be replayed and reported without rerunning models
+- TUI command
+- replay
+- direct artifact retrieval
+- run listing command
+- provider-aware key leasing beyond the current scheduler watermarks
