@@ -1,0 +1,472 @@
+use std::path::{Path, PathBuf};
+
+use anyhow::{Context, Result};
+use rusqlite::{Connection, OptionalExtension, params};
+use serde::Serialize;
+
+use crate::domain::result::{ComparisonResult, RunMetadata, RunSummary, TrialResult};
+
+pub struct StudyDatabase {
+    path: PathBuf,
+}
+
+impl StudyDatabase {
+    pub fn new(study_root: &Path) -> Result<Self> {
+        let path = study_root.join("sqlite.db");
+        let db = Self { path };
+        db.init()?;
+        Ok(db)
+    }
+
+    pub fn insert_run_metadata(&self, metadata: &RunMetadata) -> Result<()> {
+        let conn = self.open()?;
+        conn.execute(
+            r#"
+            INSERT INTO runs (
+                run_id, study_id, selection, models_json, created_at_unix_ms,
+                total_trials, comparison_count
+            ) VALUES (?1, ?2, ?3, ?4, ?5, NULL, NULL)
+            ON CONFLICT(run_id) DO UPDATE SET
+                study_id = excluded.study_id,
+                selection = excluded.selection,
+                models_json = excluded.models_json,
+                created_at_unix_ms = excluded.created_at_unix_ms
+            "#,
+            params![
+                metadata.run_id,
+                metadata.study_id,
+                metadata.selection,
+                serde_json::to_string(&metadata.models)?,
+                to_i64(metadata.created_at_unix_ms)?,
+            ],
+        )
+        .context("failed to insert run metadata into sqlite.db")?;
+
+        Ok(())
+    }
+
+    pub fn insert_trial_result(&self, run_id: &str, result: &TrialResult) -> Result<()> {
+        let conn = self.open()?;
+        conn.execute(
+            r#"
+            INSERT INTO trial_results (
+                run_id, trial_id, model_id, condition_label, output_format,
+                response_content, tokens_in, tokens_out, latency_ms,
+                normalized_json, grading_json, prompt_json
+            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)
+            ON CONFLICT(run_id, trial_id) DO UPDATE SET
+                model_id = excluded.model_id,
+                condition_label = excluded.condition_label,
+                output_format = excluded.output_format,
+                response_content = excluded.response_content,
+                tokens_in = excluded.tokens_in,
+                tokens_out = excluded.tokens_out,
+                latency_ms = excluded.latency_ms,
+                normalized_json = excluded.normalized_json,
+                grading_json = excluded.grading_json,
+                prompt_json = excluded.prompt_json
+            "#,
+            params![
+                run_id,
+                result.trial_id,
+                result.model_id,
+                result.condition_label,
+                result.output_format,
+                result.response.content,
+                result.response.tokens_in.map(i64::from),
+                result.response.tokens_out.map(i64::from),
+                to_i64(result.response.latency_ms)?,
+                serde_json::to_string(&result.normalized)?,
+                serde_json::to_string(&result.grading)?,
+                serde_json::to_string(&result.prompt)?,
+            ],
+        )
+        .context("failed to insert trial result into sqlite.db")?;
+
+        Ok(())
+    }
+
+    pub fn replace_comparisons(&self, run_id: &str, comparisons: &[ComparisonResult]) -> Result<()> {
+        let mut conn = self.open()?;
+        let tx = conn.transaction().context("failed to start sqlite comparison transaction")?;
+
+        tx.execute("DELETE FROM comparisons WHERE run_id = ?1", params![run_id])
+            .context("failed to clear existing run comparisons")?;
+
+        for comparison in comparisons {
+            tx.execute(
+                r#"
+                INSERT INTO comparisons (
+                    run_id, model_id, comparison_id, left_label, right_label, metric,
+                    left_decision, right_decision, decision_shift, refusal_shift,
+                    hedging_delta, specificity_delta
+                ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)
+                "#,
+                params![
+                    run_id,
+                    comparison.model_id,
+                    comparison.comparison_id,
+                    comparison.left_label,
+                    comparison.right_label,
+                    comparison.metric,
+                    comparison.left_decision,
+                    comparison.right_decision,
+                    bool_to_i64(comparison.decision_shift),
+                    bool_to_i64(comparison.refusal_shift),
+                    i64::from(comparison.hedging_delta),
+                    i64::from(comparison.specificity_delta),
+                ],
+            )
+            .context("failed to insert comparison into sqlite.db")?;
+        }
+
+        tx.commit().context("failed to commit sqlite comparison transaction")?;
+        Ok(())
+    }
+
+    pub fn update_run_summary(&self, summary: &RunSummary) -> Result<()> {
+        let conn = self.open()?;
+        conn.execute(
+            r#"
+            UPDATE runs
+            SET total_trials = ?2,
+                comparison_count = ?3,
+                models_json = ?4,
+                selection = ?5
+            WHERE run_id = ?1
+            "#,
+            params![
+                summary.run_id,
+                to_i64(summary.total_trials as u128)?,
+                to_i64(summary.comparisons as u128)?,
+                serde_json::to_string(&summary.models)?,
+                summary.selection,
+            ],
+        )
+        .context("failed to update run summary in sqlite.db")?;
+
+        Ok(())
+    }
+
+    pub fn latest_run_id(&self) -> Result<Option<String>> {
+        let conn = self.open()?;
+        let run_id = conn
+            .query_row(
+                "SELECT run_id FROM runs ORDER BY created_at_unix_ms DESC LIMIT 1",
+                [],
+                |row| row.get::<_, String>(0),
+            )
+            .optional()
+            .context("failed to query latest run id from sqlite.db")?;
+        Ok(run_id)
+    }
+
+    pub fn build_run_report(&self, run_id: &str) -> Result<RunReport> {
+        let conn = self.open()?;
+        let run_meta = conn
+            .query_row(
+                "SELECT run_id, study_id, selection, models_json FROM runs WHERE run_id = ?1",
+                params![run_id],
+                |row| {
+                    let models_json: String = row.get(3)?;
+                    let models: Vec<String> = serde_json::from_str(&models_json).map_err(to_sql_error)?;
+                    Ok(RunMetaRow {
+                        run_id: row.get(0)?,
+                        study_id: row.get(1)?,
+                        selection: row.get(2)?,
+                        models,
+                    })
+                },
+            )
+            .optional()
+            .context("failed to query run metadata from sqlite.db")?
+            .ok_or_else(|| anyhow::anyhow!("run `{run_id}` not found"))?;
+
+        let mut stmt = conn.prepare(
+            r#"
+            SELECT model_id, normalized_json, grading_json
+            FROM trial_results
+            WHERE run_id = ?1
+            ORDER BY model_id, trial_id
+            "#,
+        )?;
+        let trial_rows = stmt
+            .query_map(params![run_id], |row| {
+                let normalized_json: String = row.get(1)?;
+                let grading_json: String = row.get(2)?;
+                Ok(TrialReportRow {
+                    model_id: row.get(0)?,
+                    normalized: serde_json::from_str(&normalized_json).map_err(to_sql_error)?,
+                    grading: serde_json::from_str(&grading_json).map_err(to_sql_error)?,
+                })
+            })?
+            .collect::<rusqlite::Result<Vec<_>>>()
+            .context("failed to query trial results for report")?;
+
+        let mut comparison_stmt = conn.prepare(
+            r#"
+            SELECT model_id, decision_shift, refusal_shift
+            FROM comparisons
+            WHERE run_id = ?1
+            ORDER BY model_id, comparison_id
+            "#,
+        )?;
+        let comparison_rows = comparison_stmt
+            .query_map(params![run_id], |row| {
+                Ok(ComparisonReportRow {
+                    model_id: row.get(0)?,
+                    decision_shift: row.get::<_, i64>(1)? != 0,
+                    refusal_shift: row.get::<_, i64>(2)? != 0,
+                })
+            })?
+            .collect::<rusqlite::Result<Vec<_>>>()
+            .context("failed to query comparisons for report")?;
+
+        let aggregate = AggregateStats::from_rows(&trial_rows, &comparison_rows, None);
+        let mut model_ids = trial_rows
+            .iter()
+            .map(|row| row.model_id.clone())
+            .collect::<std::collections::BTreeSet<_>>();
+        for row in &comparison_rows {
+            model_ids.insert(row.model_id.clone());
+        }
+
+        let by_model = model_ids
+            .into_iter()
+            .map(|model_id| ModelReport {
+                model_id: model_id.clone(),
+                stats: AggregateStats::from_rows(&trial_rows, &comparison_rows, Some(&model_id)),
+            })
+            .collect::<Vec<_>>();
+
+        Ok(RunReport {
+            run_id: run_meta.run_id,
+            study_id: run_meta.study_id,
+            selection: run_meta.selection,
+            models: run_meta.models,
+            aggregate,
+            by_model,
+        })
+    }
+
+    fn init(&self) -> Result<()> {
+        let conn = self.open()?;
+        conn.execute_batch(
+            r#"
+            PRAGMA journal_mode = WAL;
+
+            CREATE TABLE IF NOT EXISTS runs (
+                run_id TEXT PRIMARY KEY,
+                study_id TEXT NOT NULL,
+                selection TEXT NOT NULL,
+                models_json TEXT NOT NULL,
+                created_at_unix_ms INTEGER NOT NULL,
+                total_trials INTEGER,
+                comparison_count INTEGER
+            );
+
+            CREATE TABLE IF NOT EXISTS trial_results (
+                run_id TEXT NOT NULL,
+                trial_id TEXT NOT NULL,
+                model_id TEXT NOT NULL,
+                condition_label TEXT NOT NULL,
+                output_format TEXT,
+                response_content TEXT NOT NULL,
+                tokens_in INTEGER,
+                tokens_out INTEGER,
+                latency_ms INTEGER NOT NULL,
+                normalized_json TEXT NOT NULL,
+                grading_json TEXT NOT NULL,
+                prompt_json TEXT NOT NULL,
+                PRIMARY KEY (run_id, trial_id),
+                FOREIGN KEY (run_id) REFERENCES runs(run_id)
+            );
+
+            CREATE TABLE IF NOT EXISTS comparisons (
+                run_id TEXT NOT NULL,
+                model_id TEXT NOT NULL,
+                comparison_id TEXT NOT NULL,
+                left_label TEXT NOT NULL,
+                right_label TEXT NOT NULL,
+                metric TEXT,
+                left_decision TEXT,
+                right_decision TEXT,
+                decision_shift INTEGER NOT NULL,
+                refusal_shift INTEGER NOT NULL,
+                hedging_delta INTEGER NOT NULL,
+                specificity_delta INTEGER NOT NULL,
+                PRIMARY KEY (run_id, model_id, comparison_id),
+                FOREIGN KEY (run_id) REFERENCES runs(run_id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_trial_results_run_id ON trial_results(run_id);
+            CREATE INDEX IF NOT EXISTS idx_trial_results_model_id ON trial_results(model_id);
+            CREATE INDEX IF NOT EXISTS idx_comparisons_run_id ON comparisons(run_id);
+            CREATE INDEX IF NOT EXISTS idx_comparisons_model_id ON comparisons(model_id);
+            "#,
+        )
+        .context("failed to initialize study sqlite.db schema")?;
+
+        Ok(())
+    }
+
+    fn open(&self) -> Result<Connection> {
+        let conn = Connection::open(&self.path)
+            .with_context(|| format!("failed to open {}", self.path.display()))?;
+        conn.busy_timeout(std::time::Duration::from_secs(3))
+            .context("failed to set sqlite busy_timeout")?;
+        Ok(conn)
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct RunReport {
+    pub run_id: String,
+    pub study_id: String,
+    pub selection: String,
+    pub models: Vec<String>,
+    pub aggregate: AggregateStats,
+    pub by_model: Vec<ModelReport>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct ModelReport {
+    pub model_id: String,
+    #[serde(flatten)]
+    pub stats: AggregateStats,
+}
+
+#[derive(Debug, Default, Serialize)]
+pub struct AggregateStats {
+    pub total_trials: usize,
+    pub format_valid: usize,
+    pub refusal_present: usize,
+    pub compliance_counts: Vec<(String, usize)>,
+    pub decision_counts: Vec<(String, usize)>,
+    pub avg_hedging_level: f64,
+    pub avg_harmful_specificity: f64,
+    pub comparison_count: usize,
+    pub decision_shift_count: usize,
+    pub refusal_shift_count: usize,
+}
+
+#[derive(Debug)]
+struct RunMetaRow {
+    run_id: String,
+    study_id: String,
+    selection: String,
+    models: Vec<String>,
+}
+
+#[derive(Debug)]
+struct TrialReportRow {
+    model_id: String,
+    normalized: StoredNormalized,
+    grading: StoredGrading,
+}
+
+#[derive(Debug)]
+struct ComparisonReportRow {
+    model_id: String,
+    decision_shift: bool,
+    refusal_shift: bool,
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct StoredNormalized {
+    decision: Option<String>,
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct StoredGrading {
+    format_valid: bool,
+    refusal_present: bool,
+    compliance_level: String,
+    harmful_specificity: u8,
+    hedging_level: u8,
+}
+
+impl AggregateStats {
+    fn from_rows(
+        trial_rows: &[TrialReportRow],
+        comparison_rows: &[ComparisonReportRow],
+        model_filter: Option<&str>,
+    ) -> Self {
+        let mut format_valid = 0usize;
+        let mut refusal_present = 0usize;
+        let mut hedging_sum = 0usize;
+        let mut specificity_sum = 0usize;
+        let mut compliance_counts = std::collections::BTreeMap::<String, usize>::new();
+        let mut decision_counts = std::collections::BTreeMap::<String, usize>::new();
+        let mut total_trials = 0usize;
+
+        for row in trial_rows.iter().filter(|row| model_filter.is_none_or(|id| row.model_id == id)) {
+            total_trials += 1;
+            if row.grading.format_valid {
+                format_valid += 1;
+            }
+            if row.grading.refusal_present {
+                refusal_present += 1;
+            }
+            hedging_sum += usize::from(row.grading.hedging_level);
+            specificity_sum += usize::from(row.grading.harmful_specificity);
+            *compliance_counts
+                .entry(row.grading.compliance_level.clone())
+                .or_insert(0) += 1;
+            *decision_counts
+                .entry(
+                    row.normalized
+                        .decision
+                        .clone()
+                        .unwrap_or_else(|| "NONE".to_owned()),
+                )
+                .or_insert(0) += 1;
+        }
+
+        let filtered_comparisons = comparison_rows
+            .iter()
+            .filter(|row| model_filter.is_none_or(|id| row.model_id == id))
+            .collect::<Vec<_>>();
+
+        let comparison_count = filtered_comparisons.len();
+        let decision_shift_count = filtered_comparisons.iter().filter(|row| row.decision_shift).count();
+        let refusal_shift_count = filtered_comparisons.iter().filter(|row| row.refusal_shift).count();
+
+        Self {
+            total_trials,
+            format_valid,
+            refusal_present,
+            compliance_counts: compliance_counts.into_iter().collect(),
+            decision_counts: decision_counts.into_iter().collect(),
+            avg_hedging_level: average(hedging_sum, total_trials),
+            avg_harmful_specificity: average(specificity_sum, total_trials),
+            comparison_count,
+            decision_shift_count,
+            refusal_shift_count,
+        }
+    }
+}
+
+fn to_i64(value: u128) -> Result<i64> {
+    i64::try_from(value).context("numeric value overflow while writing sqlite.db")
+}
+
+fn bool_to_i64(value: bool) -> i64 {
+    if value { 1 } else { 0 }
+}
+
+fn average(sum: usize, count: usize) -> f64 {
+    if count == 0 {
+        0.0
+    } else {
+        sum as f64 / count as f64
+    }
+}
+
+fn to_sql_error(error: serde_json::Error) -> rusqlite::Error {
+    rusqlite::Error::FromSqlConversionFailure(
+        0,
+        rusqlite::types::Type::Text,
+        Box::new(error),
+    )
+}

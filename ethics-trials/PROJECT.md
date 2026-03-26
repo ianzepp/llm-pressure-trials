@@ -99,7 +99,28 @@ Examples:
 
 Signals should be separate from raw output and separate from final interpretation.
 
-## Proposed Directory Layout
+## Current Implementation Status
+
+The current codebase is implemented in Rust.
+
+Implemented now:
+
+- study-local YAML loading and validation
+- experiment expansion into concrete trial units
+- serial live execution against OpenRouter through an OpenAI-compatible adapter
+- deterministic normalization and grading for the `simple-mercy` study
+- JSON artifact writing under each study package
+- per-study SQLite indexing
+- CLI commands for `list`, `validate`, `run`, and `report`
+
+Not implemented yet:
+
+- bounded parallel execution
+- replay
+- TUI
+- richer rubric-driven judge interpretation
+
+## Directory Layout
 
 The project should default to a scenario-package layout rather than scattering
 definitions across top-level folders.
@@ -112,11 +133,8 @@ ethics-trials/
 ├── BRIEF.md
 ├── PROJECT.md
 ├── README.md
-├── pyproject.toml
-├── config/
-│   ├── models.yml
-│   ├── providers.yml
-│   └── defaults.yml
+├── Cargo.toml
+├── Cargo.lock
 ├── schemas/
 │   ├── scenario.schema.yml
 │   ├── experiment.schema.yml
@@ -128,24 +146,27 @@ ethics-trials/
 │   │   │   └── mercy-format-stability.yml
 │   │   ├── rubrics/
 │   │   │   └── refusal-compliance-stability.yml
-│   │   ├── fixtures/
 │   │   ├── runs/
-│   │   └── results/
+│   │   └── sqlite.db
 │   ├── resonance/
 │   └── dynamics/
-├── src/ethics_trials/
-│   ├── cli.py
-│   ├── types.py
-│   ├── loader.py
-│   ├── runner.py
-│   ├── orchestrators/
+├── src/
+│   ├── main.rs
+│   ├── app.rs
+│   ├── cli/
+│   ├── domain/
+│   ├── grading/
+│   ├── loader/
+│   ├── models/
 │   ├── providers/
-│   ├── graders/
-│   ├── analyzers/
+│   ├── runner/
 │   ├── storage/
-│   └── reporting/
+│   └── tui/
 └── tests/
 ```
+
+The `runs/` directory stores full JSON artifacts per run. The `sqlite.db` file
+is a study-local query index, not the sole source of truth.
 
 ## Runner Architecture
 
@@ -247,6 +268,11 @@ Persist:
 
 Storage must support later comparison without rerunning models.
 
+Current implementation:
+
+- JSON artifacts under `studies/<study>/runs/<run-id>/`
+- a per-study SQLite index at `studies/<study>/sqlite.db`
+
 ### Phase 7: Compare
 
 The system should be able to compare:
@@ -258,6 +284,13 @@ The system should be able to compare:
 - family vs family
 - format vs format
 - scenario family vs scenario family
+
+## Design Rule
+
+There must be one runner with one set of semantics.
+
+The CLI is the current frontend. The future TUI should subscribe to the same
+runner behavior and storage model rather than reimplement execution logic.
 
 ## Study Package Layout
 

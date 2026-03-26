@@ -1,0 +1,13 @@
+/target/
+
+# Local env files
+.env
+.env.*
+
+# Local run artifacts
+studies/*/runs/
+studies/*/results/
+studies/*/sqlite.db
+
+# Editor cruft
+.DS_Store
