@@ -1,10 +1,11 @@
+use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 
-use crate::domain::model::ModelTarget;
+use crate::domain::model::{ModelPricing, ModelTarget};
 
 use crate::providers::openai::OpenAiCompatibleClient;
 
@@ -102,6 +103,40 @@ pub fn load_cached_models(root: &Path) -> Result<Vec<ModelTarget>> {
             provider: "openrouter".to_owned(),
         })
         .collect())
+}
+
+pub fn load_cached_pricing(root: &Path) -> Result<HashMap<String, ModelPricing>> {
+    let cache_path = root.join(CACHE_DIR).join(CACHE_FILE);
+    let bytes = fs::read(&cache_path)
+        .with_context(|| format!("failed to read cache file {}", cache_path.display()))?;
+    let cached: CachedModelsFile = serde_json::from_slice(&bytes)
+        .with_context(|| format!("failed to parse cache file {}", cache_path.display()))?;
+
+    let mut pricing = HashMap::new();
+    for entry in cached.data {
+        let prompt = parse_pricing_field(&entry.pricing, "prompt");
+        let completion = parse_pricing_field(&entry.pricing, "completion");
+        pricing.insert(
+            entry.id.clone(),
+            ModelPricing {
+                model_id: entry.id,
+                prompt_cost_per_token: prompt,
+                completion_cost_per_token: completion,
+            },
+        );
+    }
+
+    Ok(pricing)
+}
+
+fn parse_pricing_field(pricing: &serde_json::Value, field: &str) -> f64 {
+    let Some(s) = pricing.get(field).and_then(|v| v.as_str()) else {
+        return 0.0;
+    };
+    match s.parse::<f64>() {
+        Ok(v) => v,
+        Err(_) => 0.0,
+    }
 }
 
 fn unix_time_ms() -> Result<u128> {

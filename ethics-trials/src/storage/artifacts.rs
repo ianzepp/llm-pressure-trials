@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 
+use crate::domain::model::ModelPricing;
 use crate::domain::result::{ComparisonResult, FailedTrial, RunMetadata, RunSummary, TrialResult};
 use crate::domain::trial::TrialUnit;
 
@@ -45,6 +46,10 @@ impl ArtifactWriter {
 
     pub fn write_summary(&self, summary: &RunSummary) -> Result<()> {
         write_json(self.run_dir.join("summary.json"), summary)
+    }
+
+    pub fn write_pricing(&self, pricing: &[ModelPricing]) -> Result<()> {
+        write_json(self.run_dir.join("pricing.json"), pricing)
     }
 }
 

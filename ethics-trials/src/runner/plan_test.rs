@@ -49,6 +49,7 @@ fn expand_experiment_errors_when_condition_variant_is_missing() {
             description: None,
             mode: "abab".to_owned(),
             tags: Vec::new(),
+            repeats: 1,
             units: vec![ExperimentUnit {
                 label: "unit".to_owned(),
                 scenario: "scenario".to_owned(),

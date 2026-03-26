@@ -2,7 +2,7 @@ use anyhow::Result;
 
 use crate::cli::args::ReportArgs;
 use crate::loader::studies::StudyLoader;
-use crate::storage::sqlite::{RunReport, StudyDatabase};
+use crate::storage::sqlite::{AggregateStats, RunReport, StudyDatabase, UsageStats};
 
 pub fn run(args: ReportArgs) -> Result<()> {
     let loader = StudyLoader::new(std::env::current_dir()?);
@@ -36,72 +36,72 @@ fn print_report(report: &RunReport) {
     println!();
 
     println!("aggregate");
-    println!("  total trials: {}", report.aggregate.total_trials);
-    println!(
-        "  format valid: {} ({:.1}%)",
-        report.aggregate.format_valid,
-        pct(report.aggregate.format_valid, report.aggregate.total_trials)
-    );
-    println!(
-        "  refusal present: {} ({:.1}%)",
-        report.aggregate.refusal_present,
-        pct(
-            report.aggregate.refusal_present,
-            report.aggregate.total_trials
-        )
-    );
-    println!(
-        "  compliance: {}",
-        format_counts(&report.aggregate.compliance_counts)
-    );
-    println!(
-        "  decisions: {}",
-        format_counts(&report.aggregate.decision_counts)
-    );
-    println!(
-        "  avg hedging: {:.2}, avg specificity: {:.2}",
-        report.aggregate.avg_hedging_level, report.aggregate.avg_harmful_specificity
-    );
-    println!(
-        "  comparisons: {} total, {} decision shifts, {} refusal shifts",
-        report.aggregate.comparison_count,
-        report.aggregate.decision_shift_count,
-        report.aggregate.refusal_shift_count
-    );
+    print_stats(&report.aggregate, "  ");
     println!();
 
     println!("by model");
     for model in &report.by_model {
         println!("  {}", model.model_id);
-        println!("    total trials: {}", model.stats.total_trials);
-        println!(
-            "    format valid: {} ({:.1}%)",
-            model.stats.format_valid,
-            pct(model.stats.format_valid, model.stats.total_trials)
-        );
-        println!(
-            "    refusal present: {} ({:.1}%)",
-            model.stats.refusal_present,
-            pct(model.stats.refusal_present, model.stats.total_trials)
-        );
-        println!(
-            "    compliance: {}",
-            format_counts(&model.stats.compliance_counts)
-        );
-        println!(
-            "    decisions: {}",
-            format_counts(&model.stats.decision_counts)
-        );
-        println!(
-            "    avg hedging: {:.2}, avg specificity: {:.2}",
-            model.stats.avg_hedging_level, model.stats.avg_harmful_specificity
-        );
-        println!(
-            "    comparisons: {} total, {} decision shifts, {} refusal shifts",
-            model.stats.comparison_count,
-            model.stats.decision_shift_count,
-            model.stats.refusal_shift_count
-        );
+        print_stats(&model.stats, "    ");
+    }
+}
+
+fn print_stats(stats: &AggregateStats, indent: &str) {
+    println!("{indent}total trials: {}", stats.total_trials);
+    println!(
+        "{indent}format valid: {} ({:.1}%)",
+        stats.format_valid,
+        pct(stats.format_valid, stats.total_trials)
+    );
+    println!(
+        "{indent}refusal present: {} ({:.1}%)",
+        stats.refusal_present,
+        pct(stats.refusal_present, stats.total_trials)
+    );
+    println!(
+        "{indent}compliance: {}",
+        format_counts(&stats.compliance_counts)
+    );
+    println!(
+        "{indent}decisions: {}",
+        format_counts(&stats.decision_counts)
+    );
+    println!(
+        "{indent}avg hedging: {:.2}, avg specificity: {:.2}",
+        stats.avg_hedging_level, stats.avg_harmful_specificity
+    );
+    println!(
+        "{indent}comparisons: {} total, {} decision shifts, {} refusal shifts",
+        stats.comparison_count, stats.decision_shift_count, stats.refusal_shift_count
+    );
+    print_usage(&stats.usage, indent);
+}
+
+fn print_usage(usage: &UsageStats, indent: &str) {
+    println!(
+        "{indent}tokens in: {}  tokens out: {}",
+        usage.total_tokens_in, usage.total_tokens_out
+    );
+    println!(
+        "{indent}latency: min={}ms  avg={:.0}ms  max={}ms  stddev={:.0}ms",
+        usage.latency_min_ms.unwrap_or(0),
+        usage.latency_avg_ms,
+        usage.latency_max_ms.unwrap_or(0),
+        usage.latency_stddev_ms
+    );
+    println!(
+        "{indent}estimated cost: {}",
+        format_cost(usage.estimated_cost_usd)
+    );
+}
+
+fn format_cost(cost: f64) -> String {
+    if cost == 0.0 {
+        "$0.00".to_owned()
+    } else if cost < 0.01 {
+        format!("${cost:.6}")
+    } else {
+        format!("${cost:.4}")
     }
 }
 

@@ -7,6 +7,7 @@ use anyhow::{Context, Result, bail};
 use serde::Serialize;
 use serde_json::json;
 
+use crate::domain::model::ModelPricing;
 use crate::domain::result::{ComparisonResult, FailedTrial, RunMetadata, RunSummary, TrialResult};
 use crate::domain::trial::TrialUnit;
 use crate::loader::studies::LoadedStudy;
@@ -75,6 +76,7 @@ pub fn execute_run_request(
     scenario_id: Option<&str>,
     experiment_id: Option<&str>,
     models: &[String],
+    pricing: &HashMap<String, ModelPricing>,
     scheduler: SchedulerConfig,
     jsonl: bool,
     continue_on_error: bool,
@@ -95,6 +97,13 @@ pub fn execute_run_request(
     writer.write_run_metadata(&metadata)?;
     writer.write_trial_units(&dry_run.trial_units)?;
     database.insert_run_metadata(&metadata)?;
+
+    let run_pricing: Vec<ModelPricing> = models
+        .iter()
+        .filter_map(|id| pricing.get(id.as_str()).cloned())
+        .collect();
+    database.insert_run_pricing(&run_id, &run_pricing)?;
+    writer.write_pricing(&run_pricing)?;
 
     let client = OpenAiCompatibleClient::from_env()?;
     let mut results: Vec<TrialResult> = Vec::new();

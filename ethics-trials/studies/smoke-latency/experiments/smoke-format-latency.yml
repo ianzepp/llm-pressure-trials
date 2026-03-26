@@ -4,6 +4,7 @@ description: >
   Minimal ABAB sequence for scheduler and provider latency testing with low
   token usage.
 mode: abab
+repeats: 3
 tags:
   - smoke
   - latency

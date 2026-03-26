@@ -24,6 +24,7 @@ pub fn execute_trial(client: &OpenAiCompatibleClient, unit: &TrialUnit) -> Resul
         model_id: unit.model_id.clone(),
         condition_label: unit.condition_label.clone(),
         output_format: unit.output_format.clone(),
+        repetition_index: unit.repetition_index,
         prompt: unit.prompt.clone(),
         response: RawModelResponse {
             content: response.content,

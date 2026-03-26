@@ -4,6 +4,7 @@ use anyhow::{Context, Result};
 use rusqlite::{Connection, OptionalExtension, params};
 use serde::Serialize;
 
+use crate::domain::model::ModelPricing;
 use crate::domain::result::{ComparisonResult, FailedTrial, RunMetadata, RunSummary, TrialResult};
 
 pub struct StudyDatabase {
@@ -45,6 +46,34 @@ impl StudyDatabase {
         Ok(())
     }
 
+    pub fn insert_run_pricing(&self, run_id: &str, pricing: &[ModelPricing]) -> Result<()> {
+        let mut conn = self.open()?;
+        let tx = conn
+            .transaction()
+            .context("failed to start sqlite pricing transaction")?;
+
+        for p in pricing {
+            tx.execute(
+                r#"
+                INSERT OR REPLACE INTO model_pricing (
+                    run_id, model_id, prompt_cost_per_token, completion_cost_per_token
+                ) VALUES (?1, ?2, ?3, ?4)
+                "#,
+                params![
+                    run_id,
+                    p.model_id,
+                    p.prompt_cost_per_token,
+                    p.completion_cost_per_token,
+                ],
+            )
+            .context("failed to insert model pricing into sqlite.db")?;
+        }
+
+        tx.commit()
+            .context("failed to commit sqlite pricing transaction")?;
+        Ok(())
+    }
+
     pub fn insert_trial_result(&self, run_id: &str, result: &TrialResult) -> Result<()> {
         let conn = self.open()?;
         conn.execute(
@@ -52,8 +81,8 @@ impl StudyDatabase {
             INSERT INTO trial_results (
                 run_id, trial_id, model_id, condition_label, output_format,
                 response_content, tokens_in, tokens_out, latency_ms,
-                normalized_json, grading_json, prompt_json
-            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)
+                normalized_json, grading_json, prompt_json, repetition_index
+            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)
             ON CONFLICT(run_id, trial_id) DO UPDATE SET
                 model_id = excluded.model_id,
                 condition_label = excluded.condition_label,
@@ -64,7 +93,8 @@ impl StudyDatabase {
                 latency_ms = excluded.latency_ms,
                 normalized_json = excluded.normalized_json,
                 grading_json = excluded.grading_json,
-                prompt_json = excluded.prompt_json
+                prompt_json = excluded.prompt_json,
+                repetition_index = excluded.repetition_index
             "#,
             params![
                 run_id,
@@ -79,6 +109,7 @@ impl StudyDatabase {
                 serde_json::to_string(&result.normalized)?,
                 serde_json::to_string(&result.grading)?,
                 serde_json::to_string(&result.prompt)?,
+                result.repetition_index,
             ],
         )
         .context("failed to insert trial result into sqlite.db")?;
@@ -221,7 +252,7 @@ impl StudyDatabase {
 
         let mut stmt = conn.prepare(
             r#"
-            SELECT model_id, normalized_json, grading_json
+            SELECT model_id, normalized_json, grading_json, tokens_in, tokens_out, latency_ms
             FROM trial_results
             WHERE run_id = ?1
             ORDER BY model_id, trial_id
@@ -235,6 +266,9 @@ impl StudyDatabase {
                     model_id: row.get(0)?,
                     normalized: serde_json::from_str(&normalized_json).map_err(to_sql_error)?,
                     grading: serde_json::from_str(&grading_json).map_err(to_sql_error)?,
+                    tokens_in: row.get(3)?,
+                    tokens_out: row.get(4)?,
+                    latency_ms: row.get(5)?,
                 })
             })?
             .collect::<rusqlite::Result<Vec<_>>>()
@@ -259,7 +293,28 @@ impl StudyDatabase {
             .collect::<rusqlite::Result<Vec<_>>>()
             .context("failed to query comparisons for report")?;
 
-        let aggregate = AggregateStats::from_rows(&trial_rows, &comparison_rows, None);
+        let mut pricing_stmt = conn.prepare(
+            r#"
+            SELECT model_id, prompt_cost_per_token, completion_cost_per_token
+            FROM model_pricing
+            WHERE run_id = ?1
+            "#,
+        )?;
+        let pricing_map: std::collections::HashMap<String, PricingRow> = pricing_stmt
+            .query_map(params![run_id], |row| {
+                Ok((
+                    row.get::<_, String>(0)?,
+                    PricingRow {
+                        prompt_cost_per_token: row.get(1)?,
+                        completion_cost_per_token: row.get(2)?,
+                    },
+                ))
+            })?
+            .collect::<rusqlite::Result<_>>()
+            .context("failed to query model pricing for report")?;
+
+        let aggregate =
+            AggregateStats::from_rows(&trial_rows, &comparison_rows, &pricing_map, None);
         let mut model_ids = trial_rows
             .iter()
             .map(|row| row.model_id.clone())
@@ -272,7 +327,12 @@ impl StudyDatabase {
             .into_iter()
             .map(|model_id| ModelReport {
                 model_id: model_id.clone(),
-                stats: AggregateStats::from_rows(&trial_rows, &comparison_rows, Some(&model_id)),
+                stats: AggregateStats::from_rows(
+                    &trial_rows,
+                    &comparison_rows,
+                    &pricing_map,
+                    Some(&model_id),
+                ),
             })
             .collect::<Vec<_>>();
 
@@ -348,6 +408,15 @@ impl StudyDatabase {
                 FOREIGN KEY (run_id) REFERENCES runs(run_id)
             );
 
+            CREATE TABLE IF NOT EXISTS model_pricing (
+                run_id TEXT NOT NULL,
+                model_id TEXT NOT NULL,
+                prompt_cost_per_token REAL NOT NULL,
+                completion_cost_per_token REAL NOT NULL,
+                PRIMARY KEY (run_id, model_id),
+                FOREIGN KEY (run_id) REFERENCES runs(run_id)
+            );
+
             CREATE INDEX IF NOT EXISTS idx_trial_results_run_id ON trial_results(run_id);
             CREATE INDEX IF NOT EXISTS idx_trial_results_model_id ON trial_results(model_id);
             CREATE INDEX IF NOT EXISTS idx_comparisons_run_id ON comparisons(run_id);
@@ -359,6 +428,12 @@ impl StudyDatabase {
 
         ensure_column(&conn, "runs", "successful_trials", "INTEGER")?;
         ensure_column(&conn, "runs", "failure_count", "INTEGER")?;
+        ensure_column(
+            &conn,
+            "trial_results",
+            "repetition_index",
+            "INTEGER NOT NULL DEFAULT 0",
+        )?;
 
         Ok(())
     }
@@ -401,6 +476,18 @@ pub struct AggregateStats {
     pub comparison_count: usize,
     pub decision_shift_count: usize,
     pub refusal_shift_count: usize,
+    pub usage: UsageStats,
+}
+
+#[derive(Debug, Default, Serialize)]
+pub struct UsageStats {
+    pub total_tokens_in: u64,
+    pub total_tokens_out: u64,
+    pub latency_min_ms: Option<u64>,
+    pub latency_max_ms: Option<u64>,
+    pub latency_avg_ms: f64,
+    pub latency_stddev_ms: f64,
+    pub estimated_cost_usd: f64,
 }
 
 #[derive(Debug)]
@@ -416,6 +503,14 @@ struct TrialReportRow {
     model_id: String,
     normalized: StoredNormalized,
     grading: StoredGrading,
+    tokens_in: Option<i64>,
+    tokens_out: Option<i64>,
+    latency_ms: i64,
+}
+
+struct PricingRow {
+    prompt_cost_per_token: f64,
+    completion_cost_per_token: f64,
 }
 
 #[derive(Debug)]
@@ -443,6 +538,7 @@ impl AggregateStats {
     fn from_rows(
         trial_rows: &[TrialReportRow],
         comparison_rows: &[ComparisonReportRow],
+        pricing_map: &std::collections::HashMap<String, PricingRow>,
         model_filter: Option<&str>,
     ) -> Self {
         let mut format_valid = 0usize;
@@ -452,6 +548,15 @@ impl AggregateStats {
         let mut compliance_counts = std::collections::BTreeMap::<String, usize>::new();
         let mut decision_counts = std::collections::BTreeMap::<String, usize>::new();
         let mut total_trials = 0usize;
+
+        let mut tokens_in_sum = 0u64;
+        let mut tokens_out_sum = 0u64;
+        let mut latency_min: Option<u64> = None;
+        let mut latency_max: Option<u64> = None;
+        let mut latency_sum = 0u64;
+        let mut latency_welford_mean = 0.0f64;
+        let mut latency_welford_m2 = 0.0f64;
+        let mut cost_sum = 0.0f64;
 
         for row in trial_rows
             .iter()
@@ -477,6 +582,26 @@ impl AggregateStats {
                         .unwrap_or_else(|| "NONE".to_owned()),
                 )
                 .or_insert(0) += 1;
+
+            let t_in = row.tokens_in.unwrap_or(0).max(0) as u64;
+            let t_out = row.tokens_out.unwrap_or(0).max(0) as u64;
+            tokens_in_sum += t_in;
+            tokens_out_sum += t_out;
+
+            let lat = row.latency_ms.max(0) as u64;
+            latency_sum += lat;
+            latency_min = Some(latency_min.map_or(lat, |prev| prev.min(lat)));
+            latency_max = Some(latency_max.map_or(lat, |prev| prev.max(lat)));
+
+            let delta = lat as f64 - latency_welford_mean;
+            latency_welford_mean += delta / total_trials as f64;
+            let delta2 = lat as f64 - latency_welford_mean;
+            latency_welford_m2 += delta * delta2;
+
+            if let Some(p) = pricing_map.get(&row.model_id) {
+                cost_sum += t_in as f64 * p.prompt_cost_per_token
+                    + t_out as f64 * p.completion_cost_per_token;
+            }
         }
 
         let filtered_comparisons = comparison_rows
@@ -505,6 +630,23 @@ impl AggregateStats {
             comparison_count,
             decision_shift_count,
             refusal_shift_count,
+            usage: UsageStats {
+                total_tokens_in: tokens_in_sum,
+                total_tokens_out: tokens_out_sum,
+                latency_min_ms: latency_min,
+                latency_max_ms: latency_max,
+                latency_avg_ms: if total_trials > 0 {
+                    latency_sum as f64 / total_trials as f64
+                } else {
+                    0.0
+                },
+                latency_stddev_ms: if total_trials > 1 {
+                    (latency_welford_m2 / (total_trials - 1) as f64).sqrt()
+                } else {
+                    0.0
+                },
+                estimated_cost_usd: cost_sum,
+            },
         }
     }
 }

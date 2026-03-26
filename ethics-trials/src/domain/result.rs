@@ -7,6 +7,7 @@ pub struct TrialResult {
     pub model_id: String,
     pub condition_label: String,
     pub output_format: Option<String>,
+    pub repetition_index: u32,
     pub prompt: super::trial::ResolvedPrompt,
     pub response: RawModelResponse,
     pub normalized: NormalizedResponse,

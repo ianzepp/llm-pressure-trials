@@ -37,19 +37,24 @@ pub fn expand_experiment(
                         .and_then(|item| item.changes.output_format.clone())
                 });
 
-            units.push(TrialUnit {
-                id: format!("{experiment_id}:{condition_label}:{model_id}"),
-                study_id: study.id.clone(),
-                scenario_id: study.scenario.id.clone(),
-                experiment_id: Some(experiment.id.clone()),
-                condition_id: unit.condition.clone(),
-                condition_label,
-                variant_id: variant.map(|item| item.id),
-                model_id: model_id.clone(),
-                output_format,
-                prompt,
-                repetition_index: 0,
-            });
+            let repeat_count = unit.repeat.unwrap_or(experiment.repeats);
+            let variant_id = variant.map(|item| item.id);
+
+            for rep in 0..repeat_count {
+                units.push(TrialUnit {
+                    id: format!("{experiment_id}:{condition_label}:r{rep}:{model_id}"),
+                    study_id: study.id.clone(),
+                    scenario_id: study.scenario.id.clone(),
+                    experiment_id: Some(experiment.id.clone()),
+                    condition_id: unit.condition.clone(),
+                    condition_label: condition_label.clone(),
+                    variant_id: variant_id.clone(),
+                    model_id: model_id.clone(),
+                    output_format: output_format.clone(),
+                    prompt: prompt.clone(),
+                    repetition_index: rep,
+                });
+            }
         }
     }
 

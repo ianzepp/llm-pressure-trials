@@ -94,11 +94,14 @@ pub fn run(args: RunArgs) -> Result<()> {
         )?;
         emit_dry_run_summary(&summary, args.json)?;
     } else {
+        let root = std::env::current_dir()?;
+        let pricing = cache::load_cached_pricing(&root).unwrap_or_default();
         let summary = execute_run_request(
             &study,
             args.scenario.as_deref(),
             args.experiment.as_deref(),
             &requested_models,
+            &pricing,
             scheduler,
             args.jsonl,
             args.continue_on_error,

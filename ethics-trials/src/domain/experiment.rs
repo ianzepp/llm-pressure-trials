@@ -9,6 +9,8 @@ pub struct ExperimentDefinition {
     pub mode: String,
     #[serde(default)]
     pub tags: Vec<String>,
+    #[serde(default = "default_repeats")]
+    pub repeats: u32,
     pub units: Vec<ExperimentUnit>,
     #[serde(default)]
     pub comparisons: Vec<ExperimentComparison>,
@@ -16,6 +18,10 @@ pub struct ExperimentDefinition {
     pub attached_rubrics: Vec<String>,
     #[serde(default)]
     pub metadata: serde_yaml::Value,
+}
+
+fn default_repeats() -> u32 {
+    1
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
