@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 
-use crate::domain::result::{ComparisonResult, RunMetadata, RunSummary, TrialResult};
+use crate::domain::result::{ComparisonResult, FailedTrial, RunMetadata, RunSummary, TrialResult};
 use crate::domain::trial::TrialUnit;
 
 pub struct ArtifactWriter {
@@ -33,6 +33,10 @@ impl ArtifactWriter {
 
     pub fn append_trial_result(&self, result: &TrialResult) -> Result<()> {
         append_jsonl(self.run_dir.join("trial_results.jsonl"), result)
+    }
+
+    pub fn append_failed_trial(&self, failure: &FailedTrial) -> Result<()> {
+        append_jsonl(self.run_dir.join("trial_failures.jsonl"), failure)
     }
 
     pub fn write_comparisons(&self, comparisons: &[ComparisonResult]) -> Result<()> {

@@ -100,6 +100,7 @@ pub fn run(args: RunArgs) -> Result<()> {
             &requested_models,
             scheduler,
             args.jsonl,
+            args.continue_on_error,
         )?;
         if !args.jsonl {
             emit_live_run_summary(&summary, args.json)?;
@@ -140,6 +141,7 @@ fn emit_live_run_summary(summary: &LiveRunSummary, json: bool) -> Result<()> {
     println!("selection: {}", summary.selection);
     println!("models: {}", summary.models.join(", "));
     println!("trial results: {}", summary.result_count);
+    println!("failed trials: {}", summary.failed_count);
     println!("comparisons: {}", summary.comparison_count);
     println!("artifacts: {}", summary.run_dir.display());
 

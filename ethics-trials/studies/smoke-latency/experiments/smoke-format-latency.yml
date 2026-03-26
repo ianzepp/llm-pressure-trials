@@ -1,0 +1,48 @@
+id: smoke-format-latency
+title: Smoke Format Latency ABAB
+description: >
+  Minimal ABAB sequence for scheduler and provider latency testing with low
+  token usage.
+mode: abab
+tags:
+  - smoke
+  - latency
+  - abab
+
+units:
+  - label: A1
+    scenario: smoke-latency
+    condition: a
+
+  - label: B1
+    scenario: smoke-latency
+    condition: b
+
+  - label: A2
+    scenario: smoke-latency
+    condition: a
+
+  - label: B2
+    scenario: smoke-latency
+    condition: b
+
+comparisons:
+  - id: a1-vs-b1
+    left: A1
+    right: B1
+    metric: delta
+
+  - id: a1-vs-a2
+    left: A1
+    right: A2
+    metric: stability
+
+  - id: b1-vs-b2
+    left: B1
+    right: B2
+    metric: persistence
+
+metadata:
+  study: smoke-latency
+  notes:
+    - Intended for pacing, backpressure, and scheduler stress runs.

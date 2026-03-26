@@ -4,7 +4,7 @@ use anyhow::{Context, Result};
 use rusqlite::{Connection, OptionalExtension, params};
 use serde::Serialize;
 
-use crate::domain::result::{ComparisonResult, RunMetadata, RunSummary, TrialResult};
+use crate::domain::result::{ComparisonResult, FailedTrial, RunMetadata, RunSummary, TrialResult};
 
 pub struct StudyDatabase {
     path: PathBuf,
@@ -24,8 +24,8 @@ impl StudyDatabase {
             r#"
             INSERT INTO runs (
                 run_id, study_id, selection, models_json, created_at_unix_ms,
-                total_trials, comparison_count
-            ) VALUES (?1, ?2, ?3, ?4, ?5, NULL, NULL)
+                total_trials, successful_trials, failure_count, comparison_count
+            ) VALUES (?1, ?2, ?3, ?4, ?5, NULL, NULL, NULL, NULL)
             ON CONFLICT(run_id) DO UPDATE SET
                 study_id = excluded.study_id,
                 selection = excluded.selection,
@@ -86,6 +86,31 @@ impl StudyDatabase {
         Ok(())
     }
 
+    pub fn insert_failed_trial(&self, run_id: &str, failure: &FailedTrial) -> Result<()> {
+        let conn = self.open()?;
+        conn.execute(
+            r#"
+            INSERT INTO failed_trials (
+                run_id, trial_id, model_id, condition_label, error
+            ) VALUES (?1, ?2, ?3, ?4, ?5)
+            ON CONFLICT(run_id, trial_id) DO UPDATE SET
+                model_id = excluded.model_id,
+                condition_label = excluded.condition_label,
+                error = excluded.error
+            "#,
+            params![
+                run_id,
+                failure.trial_id,
+                failure.model_id,
+                failure.condition_label,
+                failure.error,
+            ],
+        )
+        .context("failed to insert failed trial into sqlite.db")?;
+
+        Ok(())
+    }
+
     pub fn replace_comparisons(&self, run_id: &str, comparisons: &[ComparisonResult]) -> Result<()> {
         let mut conn = self.open()?;
         let tx = conn.transaction().context("failed to start sqlite comparison transaction")?;
@@ -130,14 +155,18 @@ impl StudyDatabase {
             r#"
             UPDATE runs
             SET total_trials = ?2,
-                comparison_count = ?3,
-                models_json = ?4,
-                selection = ?5
+                successful_trials = ?3,
+                failure_count = ?4,
+                comparison_count = ?5,
+                models_json = ?6,
+                selection = ?7
             WHERE run_id = ?1
             "#,
             params![
                 summary.run_id,
                 to_i64(summary.total_trials as u128)?,
+                to_i64(summary.successful_trials as u128)?,
+                to_i64(summary.failed_trials as u128)?,
                 to_i64(summary.comparisons as u128)?,
                 serde_json::to_string(&summary.models)?,
                 summary.selection,
@@ -262,6 +291,8 @@ impl StudyDatabase {
                 models_json TEXT NOT NULL,
                 created_at_unix_ms INTEGER NOT NULL,
                 total_trials INTEGER,
+                successful_trials INTEGER,
+                failure_count INTEGER,
                 comparison_count INTEGER
             );
 
@@ -299,13 +330,27 @@ impl StudyDatabase {
                 FOREIGN KEY (run_id) REFERENCES runs(run_id)
             );
 
+            CREATE TABLE IF NOT EXISTS failed_trials (
+                run_id TEXT NOT NULL,
+                trial_id TEXT NOT NULL,
+                model_id TEXT NOT NULL,
+                condition_label TEXT NOT NULL,
+                error TEXT NOT NULL,
+                PRIMARY KEY (run_id, trial_id),
+                FOREIGN KEY (run_id) REFERENCES runs(run_id)
+            );
+
             CREATE INDEX IF NOT EXISTS idx_trial_results_run_id ON trial_results(run_id);
             CREATE INDEX IF NOT EXISTS idx_trial_results_model_id ON trial_results(model_id);
             CREATE INDEX IF NOT EXISTS idx_comparisons_run_id ON comparisons(run_id);
             CREATE INDEX IF NOT EXISTS idx_comparisons_model_id ON comparisons(model_id);
+            CREATE INDEX IF NOT EXISTS idx_failed_trials_run_id ON failed_trials(run_id);
             "#,
         )
         .context("failed to initialize study sqlite.db schema")?;
+
+        ensure_column(&conn, "runs", "successful_trials", "INTEGER")?;
+        ensure_column(&conn, "runs", "failure_count", "INTEGER")?;
 
         Ok(())
     }
@@ -453,6 +498,25 @@ fn to_i64(value: u128) -> Result<i64> {
 
 fn bool_to_i64(value: bool) -> i64 {
     if value { 1 } else { 0 }
+}
+
+fn ensure_column(conn: &Connection, table: &str, column: &str, definition: &str) -> Result<()> {
+    let mut stmt = conn.prepare(&format!("PRAGMA table_info({table})"))?;
+    let existing = stmt
+        .query_map([], |row| row.get::<_, String>(1))?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+
+    if existing.iter().any(|name| name == column) {
+        return Ok(());
+    }
+
+    conn.execute(
+        &format!("ALTER TABLE {table} ADD COLUMN {column} {definition}"),
+        [],
+    )
+    .with_context(|| format!("failed to add column `{column}` to `{table}`"))?;
+
+    Ok(())
 }
 
 fn average(sum: usize, count: usize) -> f64 {

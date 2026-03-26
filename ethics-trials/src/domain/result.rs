@@ -14,6 +14,14 @@ pub struct TrialResult {
 }
 
 #[derive(Debug, Clone, Serialize)]
+pub struct FailedTrial {
+    pub trial_id: String,
+    pub model_id: String,
+    pub condition_label: String,
+    pub error: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
 pub struct RawModelResponse {
     pub content: String,
     pub tokens_in: Option<u32>,
@@ -69,6 +77,8 @@ pub struct RunSummary {
     pub study_id: String,
     pub selection: String,
     pub total_trials: usize,
+    pub successful_trials: usize,
+    pub failed_trials: usize,
     pub comparisons: usize,
     pub models: Vec<String>,
 }

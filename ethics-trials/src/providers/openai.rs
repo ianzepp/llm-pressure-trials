@@ -1,4 +1,4 @@
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
@@ -6,11 +6,15 @@ use serde::{Deserialize, Serialize};
 use crate::providers::types::ProviderResponse;
 
 const OPENROUTER_BASE_URL: &str = "https://openrouter.ai/api/v1";
+const MAX_RETRIES: usize = 5;
+const BASE_BACKOFF_MS: u64 = 500;
+const REQUEST_TIMEOUT_SECS: u64 = 90;
 
 #[derive(Clone)]
 pub struct OpenAiCompatibleClient {
     api_key: String,
     base_url: String,
+    agent: ureq::Agent,
 }
 
 impl OpenAiCompatibleClient {
@@ -20,6 +24,9 @@ impl OpenAiCompatibleClient {
         Ok(Self {
             api_key,
             base_url: OPENROUTER_BASE_URL.to_owned(),
+            agent: ureq::AgentBuilder::new()
+                .timeout(Duration::from_secs(REQUEST_TIMEOUT_SECS))
+                .build(),
         })
     }
 
@@ -57,13 +64,17 @@ impl OpenAiCompatibleClient {
         };
 
         let started = Instant::now();
-        let response = ureq::post(&format!("{}/chat/completions", self.base_url))
-            .set("Authorization", &format!("Bearer {}", self.api_key))
-            .set("Content-Type", "application/json")
-            .set("HTTP-Referer", "https://github.com/ianzepp/ethics-trials")
-            .set("X-Title", "Ethics Trials")
-            .send_json(serde_json::to_value(&request)?)
-            .map_err(map_ureq_error)?;
+        let request_body = serde_json::to_value(&request)?;
+        let response = self.send_with_retry(|client| {
+            client
+                .agent
+                .post(&format!("{}/chat/completions", client.base_url))
+                .set("Authorization", &format!("Bearer {}", client.api_key))
+                .set("Content-Type", "application/json")
+                .set("HTTP-Referer", "https://github.com/ianzepp/ethics-trials")
+                .set("X-Title", "Ethics Trials")
+                .send_json(request_body.clone())
+        })?;
 
         let latency_ms = started.elapsed().as_millis();
 
@@ -85,16 +96,45 @@ impl OpenAiCompatibleClient {
     }
 
     pub fn list_models(&self) -> Result<OpenRouterModelsResponse> {
-        let response = ureq::get(&format!("{}/models", self.base_url))
-            .set("Authorization", &format!("Bearer {}", self.api_key))
-            .set("HTTP-Referer", "https://github.com/ianzepp/ethics-trials")
-            .set("X-Title", "Ethics Trials")
-            .call()
-            .map_err(map_ureq_error)?;
+        let response = self.send_with_retry(|client| {
+            client
+                .agent
+                .get(&format!("{}/models", client.base_url))
+                .set("Authorization", &format!("Bearer {}", client.api_key))
+                .set("HTTP-Referer", "https://github.com/ianzepp/ethics-trials")
+                .set("X-Title", "Ethics Trials")
+                .call()
+        })?;
 
         response
             .into_json()
             .context("failed to parse models response body")
+    }
+
+    fn send_with_retry<F>(&self, mut operation: F) -> Result<ureq::Response>
+    where
+        F: FnMut(&Self) -> std::result::Result<ureq::Response, ureq::Error>,
+    {
+        let mut last_error = None;
+
+        for attempt in 0..MAX_RETRIES {
+            match operation(self) {
+                Ok(response) => return Ok(response),
+                Err(error) => {
+                    let retryable = is_retryable(&error);
+                    let mapped = map_ureq_error(error);
+                    if attempt + 1 == MAX_RETRIES || !retryable {
+                        return Err(mapped);
+                    }
+                    last_error = Some(mapped);
+                    std::thread::sleep(Duration::from_millis(
+                        BASE_BACKOFF_MS * 2_u64.pow(attempt as u32),
+                    ));
+                }
+            }
+        }
+
+        Err(last_error.unwrap_or_else(|| anyhow::anyhow!("request failed after retries")))
     }
 }
 
@@ -102,9 +142,32 @@ fn map_ureq_error(error: ureq::Error) -> anyhow::Error {
     match error {
         ureq::Error::Status(status, response) => {
             let status_text = response.status_text().to_owned();
-            anyhow::anyhow!("provider returned HTTP {} {}", status, status_text)
+            let body = response
+                .into_string()
+                .unwrap_or_else(|_| "<unreadable response body>".to_owned());
+            anyhow::anyhow!(
+                "provider returned HTTP {} {}: {}",
+                status,
+                status_text,
+                truncate(&body, 500)
+            )
         }
         ureq::Error::Transport(transport) => anyhow::anyhow!("provider transport error: {}", transport),
+    }
+}
+
+fn is_retryable(error: &ureq::Error) -> bool {
+    match error {
+        ureq::Error::Status(status, _) => *status == 429 || *status >= 500,
+        ureq::Error::Transport(_) => true,
+    }
+}
+
+fn truncate(value: &str, limit: usize) -> String {
+    if value.len() <= limit {
+        value.to_owned()
+    } else {
+        format!("{}...", &value[..limit])
     }
 }
 

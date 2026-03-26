@@ -88,6 +88,8 @@ pub struct RunArgs {
     #[arg(long)]
     pub jsonl: bool,
     #[arg(long)]
+    pub continue_on_error: bool,
+    #[arg(long)]
     pub dry_run: bool,
 }
 

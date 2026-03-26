@@ -7,7 +7,7 @@ use anyhow::Result;
 use serde::Serialize;
 use serde_json::json;
 
-use crate::domain::result::{ComparisonResult, RunMetadata, RunSummary, TrialResult};
+use crate::domain::result::{ComparisonResult, FailedTrial, RunMetadata, RunSummary, TrialResult};
 use crate::domain::trial::TrialUnit;
 use crate::loader::studies::LoadedStudy;
 use crate::providers::openai::OpenAiCompatibleClient;
@@ -32,6 +32,7 @@ pub struct LiveRunSummary {
     pub selection: String,
     pub models: Vec<String>,
     pub result_count: usize,
+    pub failed_count: usize,
     pub comparison_count: usize,
     pub run_dir: std::path::PathBuf,
 }
@@ -70,6 +71,7 @@ pub fn execute_run_request(
     models: &[String],
     scheduler: SchedulerConfig,
     jsonl: bool,
+    continue_on_error: bool,
 ) -> Result<LiveRunSummary> {
     let dry_run = expand_run_request(study, scenario_id, experiment_id, models)?;
     let run_id = make_run_id();
@@ -90,6 +92,7 @@ pub fn execute_run_request(
 
     let client = OpenAiCompatibleClient::from_env()?;
     let mut results: Vec<TrialResult> = Vec::new();
+    let mut failures: Vec<FailedTrial> = Vec::new();
     let grouped_units = group_trial_units(&dry_run.trial_units);
     let mut sequences = grouped_units
         .into_iter()
@@ -149,6 +152,12 @@ pub fn execute_run_request(
                     results.push(result);
                 }
                 Err(error) => {
+                    let failure = FailedTrial {
+                        trial_id: message.trial_id.clone(),
+                        model_id: message.model_id.clone(),
+                        condition_label: message.condition_label.clone(),
+                        error: format!("{error:#}"),
+                    };
                     emit_jsonl_event(
                         jsonl,
                         json!({
@@ -156,12 +165,19 @@ pub fn execute_run_request(
                             "event": "trial_failed",
                             "run_id": run_id,
                             "study_id": study.id,
-                            "sequence_index": message.sequence_index,
+                            "trial_id": message.trial_id,
+                            "model_id": message.model_id,
+                            "condition_label": message.condition_label,
                             "in_flight": inflight,
-                            "error": format!("{error:#}"),
+                            "error": failure.error,
                         }),
                     )?;
-                    return Err(error);
+                    writer.append_failed_trial(&failure)?;
+                    database.insert_failed_trial(&run_id, &failure)?;
+                    failures.push(failure);
+                    if !continue_on_error {
+                        return Err(error);
+                    }
                 }
             }
             completed += 1;
@@ -241,6 +257,9 @@ pub fn execute_run_request(
                         let result = execute_trial(&client, &unit);
                         let _ = tx.send(WorkerMessage {
                             sequence_index,
+                            trial_id: unit.id.clone(),
+                            model_id: unit.model_id.clone(),
+                            condition_label: unit.condition_label.clone(),
                             result,
                         });
                     });
@@ -283,6 +302,12 @@ pub fn execute_run_request(
                         results.push(result);
                     }
                     Err(error) => {
+                        let failure = FailedTrial {
+                            trial_id: message.trial_id.clone(),
+                            model_id: message.model_id.clone(),
+                            condition_label: message.condition_label.clone(),
+                            error: format!("{error:#}"),
+                        };
                         emit_jsonl_event(
                             jsonl,
                             json!({
@@ -290,12 +315,19 @@ pub fn execute_run_request(
                                 "event": "trial_failed",
                                 "run_id": run_id,
                                 "study_id": study.id,
-                                "sequence_index": message.sequence_index,
+                                "trial_id": message.trial_id,
+                                "model_id": message.model_id,
+                                "condition_label": message.condition_label,
                                 "in_flight": inflight,
-                                "error": format!("{error:#}"),
+                                "error": failure.error,
                             }),
                         )?;
-                        return Err(error);
+                        writer.append_failed_trial(&failure)?;
+                        database.insert_failed_trial(&run_id, &failure)?;
+                        failures.push(failure);
+                        if !continue_on_error {
+                            return Err(error);
+                        }
                     }
                 }
                 completed += 1;
@@ -340,7 +372,9 @@ pub fn execute_run_request(
         run_id: run_id.clone(),
         study_id: study.id.clone(),
         selection,
-        total_trials: results.len(),
+        total_trials,
+        successful_trials: results.len(),
+        failed_trials: failures.len(),
         comparisons: comparisons.len(),
         models: models.to_vec(),
     };
@@ -356,6 +390,7 @@ pub fn execute_run_request(
             "study_id": study.id,
             "selection": summary.selection,
             "result_count": results.len(),
+            "failed_count": failures.len(),
             "comparison_count": comparisons.len(),
             "run_dir": writer.run_dir().display().to_string(),
         }),
@@ -367,6 +402,7 @@ pub fn execute_run_request(
         selection: summary.selection,
         models: models.to_vec(),
         result_count: results.len(),
+        failed_count: failures.len(),
         comparison_count: comparisons.len(),
         run_dir: writer.run_dir().to_path_buf(),
     })
@@ -374,6 +410,9 @@ pub fn execute_run_request(
 
 struct WorkerMessage {
     sequence_index: usize,
+    trial_id: String,
+    model_id: String,
+    condition_label: String,
     result: Result<TrialResult>,
 }
 
