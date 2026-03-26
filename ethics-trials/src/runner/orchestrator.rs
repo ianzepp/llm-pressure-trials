@@ -1,5 +1,11 @@
+use std::collections::{HashMap, VecDeque};
+use std::io::Write;
+use std::sync::mpsc;
+use std::time::{Duration, Instant};
+
 use anyhow::Result;
 use serde::Serialize;
+use serde_json::json;
 
 use crate::domain::result::{ComparisonResult, RunMetadata, RunSummary, TrialResult};
 use crate::domain::trial::TrialUnit;
@@ -30,6 +36,13 @@ pub struct LiveRunSummary {
     pub run_dir: std::path::PathBuf,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct SchedulerConfig {
+    pub launch_interval_ms: u64,
+    pub high_water: usize,
+    pub low_water: usize,
+}
+
 pub fn expand_run_request(
     study: &LoadedStudy,
     scenario_id: Option<&str>,
@@ -55,6 +68,8 @@ pub fn execute_run_request(
     scenario_id: Option<&str>,
     experiment_id: Option<&str>,
     models: &[String],
+    scheduler: SchedulerConfig,
+    jsonl: bool,
 ) -> Result<LiveRunSummary> {
     let dry_run = expand_run_request(study, scenario_id, experiment_id, models)?;
     let run_id = make_run_id();
@@ -75,12 +90,245 @@ pub fn execute_run_request(
 
     let client = OpenAiCompatibleClient::from_env()?;
     let mut results: Vec<TrialResult> = Vec::new();
+    let grouped_units = group_trial_units(&dry_run.trial_units);
+    let mut sequences = grouped_units
+        .into_iter()
+        .map(VecDeque::from)
+        .collect::<Vec<VecDeque<crate::domain::trial::TrialUnit>>>();
+    let mut ready = (0..sequences.len()).collect::<VecDeque<_>>();
+    let mut inflight = 0usize;
+    let total_trials = dry_run.trial_units.len();
+    let mut completed = 0usize;
+    let mut backpressured = false;
+    let mut last_launch: Option<Instant> = None;
+    let (tx, rx) = mpsc::channel::<WorkerMessage>();
 
-    for unit in &dry_run.trial_units {
-        let result = execute_trial(&client, unit)?;
-        writer.append_trial_result(&result)?;
-        database.insert_trial_result(&run_id, &result)?;
-        results.push(result);
+    emit_jsonl_event(
+        jsonl,
+        json!({
+            "ts_unix_ms": unix_time_ms(),
+            "event": "run_started",
+            "run_id": run_id,
+            "study_id": study.id,
+            "selection": selection,
+            "model_count": models.len(),
+            "trial_count": total_trials,
+            "launch_interval_ms": scheduler.launch_interval_ms,
+            "high_water": scheduler.high_water,
+            "low_water": scheduler.low_water,
+        }),
+    )?;
+
+    while completed < total_trials {
+        while let Ok(message) = rx.try_recv() {
+            inflight = inflight.saturating_sub(1);
+            match message.result {
+                Ok(result) => {
+                    emit_jsonl_event(
+                        jsonl,
+                        json!({
+                            "ts_unix_ms": unix_time_ms(),
+                            "event": "trial_completed",
+                            "run_id": run_id,
+                            "study_id": study.id,
+                            "trial_id": result.trial_id,
+                            "model_id": result.model_id,
+                            "condition_label": result.condition_label,
+                            "latency_ms": result.response.latency_ms,
+                            "format_valid": result.grading.format_valid,
+                            "decision": result.normalized.decision,
+                            "compliance_level": result.grading.compliance_level,
+                            "refusal_present": result.grading.refusal_present,
+                            "in_flight": inflight,
+                            "completed": completed + 1,
+                            "total_trials": total_trials,
+                        }),
+                    )?;
+                    writer.append_trial_result(&result)?;
+                    database.insert_trial_result(&run_id, &result)?;
+                    results.push(result);
+                }
+                Err(error) => {
+                    emit_jsonl_event(
+                        jsonl,
+                        json!({
+                            "ts_unix_ms": unix_time_ms(),
+                            "event": "trial_failed",
+                            "run_id": run_id,
+                            "study_id": study.id,
+                            "sequence_index": message.sequence_index,
+                            "in_flight": inflight,
+                            "error": format!("{error:#}"),
+                        }),
+                    )?;
+                    return Err(error);
+                }
+            }
+            completed += 1;
+
+            if !sequences[message.sequence_index].is_empty() {
+                ready.push_back(message.sequence_index);
+            }
+
+            if backpressured && inflight <= scheduler.low_water {
+                backpressured = false;
+                emit_jsonl_event(
+                    jsonl,
+                    json!({
+                        "ts_unix_ms": unix_time_ms(),
+                        "event": "backpressure_off",
+                        "run_id": run_id,
+                        "study_id": study.id,
+                        "in_flight": inflight,
+                        "high_water": scheduler.high_water,
+                        "low_water": scheduler.low_water,
+                    }),
+                )?;
+            }
+        }
+
+        if inflight >= scheduler.high_water {
+            if !backpressured {
+                backpressured = true;
+                emit_jsonl_event(
+                    jsonl,
+                    json!({
+                        "ts_unix_ms": unix_time_ms(),
+                        "event": "backpressure_on",
+                        "run_id": run_id,
+                        "study_id": study.id,
+                        "in_flight": inflight,
+                        "high_water": scheduler.high_water,
+                        "low_water": scheduler.low_water,
+                    }),
+                )?;
+            }
+        }
+
+        let launch_due = last_launch.is_none_or(|last| {
+            last.elapsed() >= Duration::from_millis(scheduler.launch_interval_ms)
+        });
+
+        if !backpressured && inflight < scheduler.high_water && launch_due {
+            if let Some(sequence_index) = ready.pop_front() {
+                if let Some(unit) = sequences[sequence_index].pop_front() {
+                    let tx = tx.clone();
+                    let client = client.clone();
+                    let launched_trial_id = unit.id.clone();
+                    let launched_model_id = unit.model_id.clone();
+                    let launched_condition_label = unit.condition_label.clone();
+                    inflight += 1;
+                    last_launch = Some(Instant::now());
+
+                    emit_jsonl_event(
+                        jsonl,
+                        json!({
+                            "ts_unix_ms": unix_time_ms(),
+                            "event": "trial_launched",
+                            "run_id": run_id,
+                            "study_id": study.id,
+                            "trial_id": launched_trial_id,
+                            "model_id": launched_model_id,
+                            "condition_label": launched_condition_label,
+                            "in_flight": inflight,
+                            "high_water": scheduler.high_water,
+                            "low_water": scheduler.low_water,
+                            "launch_interval_ms": scheduler.launch_interval_ms,
+                        }),
+                    )?;
+
+                    std::thread::spawn(move || {
+                        let result = execute_trial(&client, &unit);
+                        let _ = tx.send(WorkerMessage {
+                            sequence_index,
+                            result,
+                        });
+                    });
+                    continue;
+                }
+            }
+        }
+
+        if completed == total_trials {
+            break;
+        }
+
+        match rx.recv_timeout(Duration::from_millis(50)) {
+            Ok(message) => {
+                inflight = inflight.saturating_sub(1);
+                match message.result {
+                    Ok(result) => {
+                        emit_jsonl_event(
+                            jsonl,
+                            json!({
+                                "ts_unix_ms": unix_time_ms(),
+                                "event": "trial_completed",
+                                "run_id": run_id,
+                                "study_id": study.id,
+                                "trial_id": result.trial_id,
+                                "model_id": result.model_id,
+                                "condition_label": result.condition_label,
+                                "latency_ms": result.response.latency_ms,
+                                "format_valid": result.grading.format_valid,
+                                "decision": result.normalized.decision,
+                                "compliance_level": result.grading.compliance_level,
+                                "refusal_present": result.grading.refusal_present,
+                                "in_flight": inflight,
+                                "completed": completed + 1,
+                                "total_trials": total_trials,
+                            }),
+                        )?;
+                        writer.append_trial_result(&result)?;
+                        database.insert_trial_result(&run_id, &result)?;
+                        results.push(result);
+                    }
+                    Err(error) => {
+                        emit_jsonl_event(
+                            jsonl,
+                            json!({
+                                "ts_unix_ms": unix_time_ms(),
+                                "event": "trial_failed",
+                                "run_id": run_id,
+                                "study_id": study.id,
+                                "sequence_index": message.sequence_index,
+                                "in_flight": inflight,
+                                "error": format!("{error:#}"),
+                            }),
+                        )?;
+                        return Err(error);
+                    }
+                }
+                completed += 1;
+
+                if !sequences[message.sequence_index].is_empty() {
+                    ready.push_back(message.sequence_index);
+                }
+
+                if backpressured && inflight <= scheduler.low_water {
+                    backpressured = false;
+                    emit_jsonl_event(
+                        jsonl,
+                        json!({
+                            "ts_unix_ms": unix_time_ms(),
+                            "event": "backpressure_off",
+                            "run_id": run_id,
+                            "study_id": study.id,
+                            "in_flight": inflight,
+                            "high_water": scheduler.high_water,
+                            "low_water": scheduler.low_water,
+                        }),
+                    )?;
+                }
+            }
+            Err(mpsc::RecvTimeoutError::Timeout) => {}
+            Err(mpsc::RecvTimeoutError::Disconnected) => {
+                if completed < total_trials {
+                    return Err(anyhow::anyhow!(
+                        "scheduler channel disconnected before all trials completed"
+                    ));
+                }
+            }
+        }
     }
 
     let experiment = experiment_id.and_then(|id| study.experiments.iter().find(|item| item.id == id));
@@ -99,6 +347,20 @@ pub fn execute_run_request(
     writer.write_summary(&summary)?;
     database.update_run_summary(&summary)?;
 
+    emit_jsonl_event(
+        jsonl,
+        json!({
+            "ts_unix_ms": unix_time_ms(),
+            "event": "run_completed",
+            "run_id": run_id,
+            "study_id": study.id,
+            "selection": summary.selection,
+            "result_count": results.len(),
+            "comparison_count": comparisons.len(),
+            "run_dir": writer.run_dir().display().to_string(),
+        }),
+    )?;
+
     Ok(LiveRunSummary {
         run_id,
         study_id: study.id.clone(),
@@ -110,6 +372,37 @@ pub fn execute_run_request(
     })
 }
 
+struct WorkerMessage {
+    sequence_index: usize,
+    result: Result<TrialResult>,
+}
+
+fn group_trial_units(
+    units: &[crate::domain::trial::TrialUnit],
+) -> Vec<Vec<crate::domain::trial::TrialUnit>> {
+    let mut grouped = Vec::new();
+    let mut order = Vec::new();
+    let mut by_model = HashMap::<String, Vec<crate::domain::trial::TrialUnit>>::new();
+
+    for unit in units {
+        if !by_model.contains_key(&unit.model_id) {
+            order.push(unit.model_id.clone());
+        }
+        by_model
+            .entry(unit.model_id.clone())
+            .or_default()
+            .push(unit.clone());
+    }
+
+    for model_id in order {
+        if let Some(group) = by_model.remove(&model_id) {
+            grouped.push(group);
+        }
+    }
+
+    grouped
+}
+
 fn unix_time_ms() -> u128 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -119,4 +412,16 @@ fn unix_time_ms() -> u128 {
 
 fn make_run_id() -> String {
     format!("run-{}", unix_time_ms())
+}
+
+fn emit_jsonl_event(enabled: bool, value: serde_json::Value) -> Result<()> {
+    if !enabled {
+        return Ok(());
+    }
+
+    let mut stdout = std::io::stdout().lock();
+    serde_json::to_writer(&mut stdout, &value)?;
+    stdout.write_all(b"\n")?;
+    stdout.flush()?;
+    Ok(())
 }

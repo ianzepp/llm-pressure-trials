@@ -7,7 +7,7 @@ use crate::loader::validate::validate_study;
 use crate::models::registry;
 use crate::models::selection::{filter_model_ids, filter_models, parse_providers};
 use crate::runner::orchestrator::{
-    DryRunSummary, LiveRunSummary, expand_run_request, execute_run_request,
+    DryRunSummary, LiveRunSummary, SchedulerConfig, expand_run_request, execute_run_request,
 };
 
 pub fn run(args: RunArgs) -> Result<()> {
@@ -19,8 +19,20 @@ pub fn run(args: RunArgs) -> Result<()> {
         bail!("--scenario and --experiment are mutually exclusive");
     }
 
+    if args.json && args.jsonl {
+        bail!("--json and --jsonl are mutually exclusive");
+    }
+
     if !args.model.is_empty() && args.pattern.is_some() {
         bail!("--model and --pattern are mutually exclusive");
+    }
+
+    if args.low_water >= args.high_water {
+        bail!("--low-water must be less than --high-water");
+    }
+
+    if args.dry_run && args.jsonl {
+        bail!("--jsonl is only supported for live runs");
     }
 
     let loader = StudyLoader::new(std::env::current_dir()?);
@@ -66,6 +78,12 @@ pub fn run(args: RunArgs) -> Result<()> {
         filtered
     };
 
+    let scheduler = SchedulerConfig {
+        launch_interval_ms: args.launch_interval_ms,
+        high_water: args.high_water,
+        low_water: args.low_water,
+    };
+
     if args.dry_run {
         let summary = expand_run_request(
             &study,
@@ -80,8 +98,12 @@ pub fn run(args: RunArgs) -> Result<()> {
             args.scenario.as_deref(),
             args.experiment.as_deref(),
             &requested_models,
+            scheduler,
+            args.jsonl,
         )?;
-        emit_live_run_summary(&summary, args.json)?;
+        if !args.jsonl {
+            emit_live_run_summary(&summary, args.json)?;
+        }
     }
 
     Ok(())

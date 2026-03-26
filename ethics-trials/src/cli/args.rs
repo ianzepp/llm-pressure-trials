@@ -77,8 +77,16 @@ pub struct RunArgs {
     pub providers: Option<String>,
     #[arg(long)]
     pub limit: Option<usize>,
+    #[arg(long, default_value_t = 1000)]
+    pub launch_interval_ms: u64,
+    #[arg(long, default_value_t = 24)]
+    pub high_water: usize,
+    #[arg(long, default_value_t = 12)]
+    pub low_water: usize,
     #[arg(long)]
     pub json: bool,
+    #[arg(long)]
+    pub jsonl: bool,
     #[arg(long)]
     pub dry_run: bool,
 }

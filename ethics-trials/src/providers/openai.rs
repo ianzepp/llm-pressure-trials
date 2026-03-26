@@ -7,6 +7,7 @@ use crate::providers::types::ProviderResponse;
 
 const OPENROUTER_BASE_URL: &str = "https://openrouter.ai/api/v1";
 
+#[derive(Clone)]
 pub struct OpenAiCompatibleClient {
     api_key: String,
     base_url: String,
