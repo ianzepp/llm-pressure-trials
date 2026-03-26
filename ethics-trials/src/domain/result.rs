@@ -12,6 +12,12 @@ pub struct TrialResult {
     pub response: RawModelResponse,
     pub normalized: NormalizedResponse,
     pub grading: DeterministicGrade,
+    #[serde(default)]
+    pub coercion_response: Option<RawModelResponse>,
+    #[serde(default)]
+    pub coercion_normalized: Option<NormalizedResponse>,
+    #[serde(default)]
+    pub coercion_grading: Option<DeterministicGrade>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

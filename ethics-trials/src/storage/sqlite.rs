@@ -81,8 +81,11 @@ impl StudyDatabase {
             INSERT INTO trial_results (
                 run_id, trial_id, model_id, condition_label, output_format,
                 response_content, tokens_in, tokens_out, latency_ms,
-                normalized_json, grading_json, prompt_json, repetition_index
-            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)
+                normalized_json, grading_json, prompt_json, repetition_index,
+                coercion_content, coercion_normalized_json, coercion_grading_json,
+                coercion_tokens_in, coercion_tokens_out, coercion_latency_ms
+            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13,
+                      ?14, ?15, ?16, ?17, ?18, ?19)
             ON CONFLICT(run_id, trial_id) DO UPDATE SET
                 model_id = excluded.model_id,
                 condition_label = excluded.condition_label,
@@ -94,7 +97,13 @@ impl StudyDatabase {
                 normalized_json = excluded.normalized_json,
                 grading_json = excluded.grading_json,
                 prompt_json = excluded.prompt_json,
-                repetition_index = excluded.repetition_index
+                repetition_index = excluded.repetition_index,
+                coercion_content = excluded.coercion_content,
+                coercion_normalized_json = excluded.coercion_normalized_json,
+                coercion_grading_json = excluded.coercion_grading_json,
+                coercion_tokens_in = excluded.coercion_tokens_in,
+                coercion_tokens_out = excluded.coercion_tokens_out,
+                coercion_latency_ms = excluded.coercion_latency_ms
             "#,
             params![
                 run_id,
@@ -110,6 +119,12 @@ impl StudyDatabase {
                 serde_json::to_string(&result.grading)?,
                 serde_json::to_string(&result.prompt)?,
                 result.repetition_index,
+                result.coercion_response.as_ref().map(|r| r.content.clone()),
+                result.coercion_normalized.as_ref().map(|n| serde_json::to_string(n)).transpose()?,
+                result.coercion_grading.as_ref().map(|g| serde_json::to_string(g)).transpose()?,
+                result.coercion_response.as_ref().and_then(|r| r.tokens_in.map(i64::from)),
+                result.coercion_response.as_ref().and_then(|r| r.tokens_out.map(i64::from)),
+                result.coercion_response.as_ref().map(|r| r.latency_ms as i64),
             ],
         )
         .context("failed to insert trial result into sqlite.db")?;
@@ -277,7 +292,8 @@ impl StudyDatabase {
 
         let mut stmt = conn.prepare(
             r#"
-            SELECT model_id, normalized_json, grading_json, tokens_in, tokens_out, latency_ms
+            SELECT model_id, normalized_json, grading_json, tokens_in, tokens_out, latency_ms,
+                   condition_label, coercion_grading_json, coercion_normalized_json
             FROM trial_results
             WHERE run_id = ?1
             ORDER BY model_id, trial_id
@@ -287,6 +303,8 @@ impl StudyDatabase {
             .query_map(params![run_id], |row| {
                 let normalized_json: String = row.get(1)?;
                 let grading_json: String = row.get(2)?;
+                let coercion_grading_json: Option<String> = row.get(7)?;
+                let coercion_normalized_json: Option<String> = row.get(8)?;
                 Ok(TrialReportRow {
                     model_id: row.get(0)?,
                     normalized: serde_json::from_str(&normalized_json).map_err(to_sql_error)?,
@@ -294,6 +312,17 @@ impl StudyDatabase {
                     tokens_in: row.get(3)?,
                     tokens_out: row.get(4)?,
                     latency_ms: row.get(5)?,
+                    condition_label: row.get(6)?,
+                    coercion_grading: coercion_grading_json
+                        .as_deref()
+                        .map(|s| serde_json::from_str(s).map_err(to_sql_error))
+                        .transpose()?,
+                    coercion_decision: coercion_normalized_json
+                        .as_deref()
+                        .and_then(|s| match serde_json::from_str::<StoredNormalized>(s) {
+                            Ok(n) => n.decision,
+                            Err(_) => None,
+                        }),
                 })
             })?
             .collect::<rusqlite::Result<Vec<_>>>()
@@ -350,14 +379,18 @@ impl StudyDatabase {
 
         let by_model = model_ids
             .into_iter()
-            .map(|model_id| ModelReport {
-                model_id: model_id.clone(),
-                stats: AggregateStats::from_rows(
-                    &trial_rows,
-                    &comparison_rows,
-                    &pricing_map,
-                    Some(&model_id),
-                ),
+            .map(|model_id| {
+                let votes = compute_votes(&trial_rows, &model_id);
+                ModelReport {
+                    model_id: model_id.clone(),
+                    stats: AggregateStats::from_rows(
+                        &trial_rows,
+                        &comparison_rows,
+                        &pricing_map,
+                        Some(&model_id),
+                    ),
+                    votes,
+                }
             })
             .collect::<Vec<_>>();
 
@@ -459,6 +492,12 @@ impl StudyDatabase {
             "repetition_index",
             "INTEGER NOT NULL DEFAULT 0",
         )?;
+        ensure_column(&conn, "trial_results", "coercion_content", "TEXT")?;
+        ensure_column(&conn, "trial_results", "coercion_normalized_json", "TEXT")?;
+        ensure_column(&conn, "trial_results", "coercion_grading_json", "TEXT")?;
+        ensure_column(&conn, "trial_results", "coercion_tokens_in", "INTEGER")?;
+        ensure_column(&conn, "trial_results", "coercion_tokens_out", "INTEGER")?;
+        ensure_column(&conn, "trial_results", "coercion_latency_ms", "INTEGER")?;
 
         Ok(())
     }
@@ -487,6 +526,7 @@ pub struct ModelReport {
     pub model_id: String,
     #[serde(flatten)]
     pub stats: AggregateStats,
+    pub votes: Vec<VoteSummary>,
 }
 
 #[derive(Debug, Default, Serialize)]
@@ -501,6 +541,8 @@ pub struct AggregateStats {
     pub comparison_count: usize,
     pub decision_shift_count: usize,
     pub refusal_shift_count: usize,
+    pub coercion_attempts: usize,
+    pub coercion_overrides: usize,
     pub usage: UsageStats,
 }
 
@@ -526,11 +568,24 @@ struct RunMetaRow {
 #[derive(Debug)]
 struct TrialReportRow {
     model_id: String,
+    condition_label: String,
     normalized: StoredNormalized,
     grading: StoredGrading,
     tokens_in: Option<i64>,
     tokens_out: Option<i64>,
     latency_ms: i64,
+    coercion_grading: Option<StoredGrading>,
+    coercion_decision: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct VoteSummary {
+    pub model_id: String,
+    pub condition_label: String,
+    pub winning_decision: String,
+    pub vote_count: usize,
+    pub total_votes: usize,
+    pub unanimous: bool,
 }
 
 struct PricingRow {
@@ -582,6 +637,8 @@ impl AggregateStats {
         let mut latency_welford_mean = 0.0f64;
         let mut latency_welford_m2 = 0.0f64;
         let mut cost_sum = 0.0f64;
+        let mut coercion_attempts = 0usize;
+        let mut coercion_overrides = 0usize;
 
         for row in trial_rows
             .iter()
@@ -627,6 +684,13 @@ impl AggregateStats {
                 cost_sum += t_in as f64 * p.prompt_cost_per_token
                     + t_out as f64 * p.completion_cost_per_token;
             }
+
+            if let Some(cg) = &row.coercion_grading {
+                coercion_attempts += 1;
+                if !cg.refusal_present {
+                    coercion_overrides += 1;
+                }
+            }
         }
 
         let filtered_comparisons = comparison_rows
@@ -655,6 +719,8 @@ impl AggregateStats {
             comparison_count,
             decision_shift_count,
             refusal_shift_count,
+            coercion_attempts,
+            coercion_overrides,
             usage: UsageStats {
                 total_tokens_in: tokens_in_sum,
                 total_tokens_out: tokens_out_sum,
@@ -709,6 +775,47 @@ fn average(sum: usize, count: usize) -> f64 {
     } else {
         sum as f64 / count as f64
     }
+}
+
+fn compute_votes(trial_rows: &[TrialReportRow], model_id: &str) -> Vec<VoteSummary> {
+    let mut by_condition =
+        std::collections::BTreeMap::<String, std::collections::BTreeMap<String, usize>>::new();
+
+    for row in trial_rows
+        .iter()
+        .filter(|row| row.model_id == model_id)
+    {
+        // Use coercion decision if available, otherwise primary decision
+        let decision = row
+            .coercion_decision
+            .clone()
+            .or_else(|| row.normalized.decision.clone())
+            .unwrap_or_else(|| "NONE".to_owned());
+        *by_condition
+            .entry(row.condition_label.clone())
+            .or_default()
+            .entry(decision)
+            .or_insert(0) += 1;
+    }
+
+    by_condition
+        .into_iter()
+        .map(|(condition_label, tallies)| {
+            let total_votes: usize = tallies.values().sum();
+            let (winning_decision, vote_count) = tallies
+                .into_iter()
+                .max_by_key(|(_, count)| *count)
+                .unwrap_or_else(|| ("NONE".to_owned(), 0));
+            VoteSummary {
+                model_id: model_id.to_owned(),
+                condition_label,
+                winning_decision,
+                unanimous: vote_count == total_votes,
+                vote_count,
+                total_votes,
+            }
+        })
+        .collect()
 }
 
 fn to_sql_error(error: serde_json::Error) -> rusqlite::Error {

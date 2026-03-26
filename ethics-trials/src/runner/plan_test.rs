@@ -26,6 +26,7 @@ fn expand_experiment_errors_when_condition_variant_is_missing() {
                 system: None,
                 user: "prompt".to_owned(),
                 context: None,
+                coercion: None,
             },
             variants: vec![ScenarioVariant {
                 id: "present".to_owned(),

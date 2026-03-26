@@ -2,7 +2,9 @@ use anyhow::Result;
 
 use crate::cli::args::ReportArgs;
 use crate::loader::studies::StudyLoader;
-use crate::storage::sqlite::{AggregateStats, RunReport, StudyDatabase, UsageStats};
+use crate::storage::sqlite::{
+    AggregateStats, ModelReport, RunReport, StudyDatabase, UsageStats, VoteSummary,
+};
 
 pub fn run(args: ReportArgs) -> Result<()> {
     let loader = StudyLoader::new(std::env::current_dir()?);
@@ -42,7 +44,14 @@ fn print_report(report: &RunReport) {
     println!("by model");
     for model in &report.by_model {
         println!("  {}", model.model_id);
-        print_stats(&model.stats, "    ");
+        print_model_report(model, "    ");
+    }
+}
+
+fn print_model_report(model: &ModelReport, indent: &str) {
+    print_stats(&model.stats, indent);
+    if !model.votes.is_empty() {
+        print_votes(&model.votes, indent);
     }
 }
 
@@ -74,7 +83,30 @@ fn print_stats(stats: &AggregateStats, indent: &str) {
         "{indent}comparisons: {} total, {} decision shifts, {} refusal shifts",
         stats.comparison_count, stats.decision_shift_count, stats.refusal_shift_count
     );
+    if stats.coercion_attempts > 0 {
+        println!(
+            "{indent}coercion: {} attempts, {} overrides ({:.1}%)",
+            stats.coercion_attempts,
+            stats.coercion_overrides,
+            pct(stats.coercion_overrides, stats.coercion_attempts)
+        );
+    }
     print_usage(&stats.usage, indent);
+}
+
+fn print_votes(votes: &[VoteSummary], indent: &str) {
+    println!("{indent}votes:");
+    for vote in votes {
+        let label = if vote.unanimous {
+            "unanimous".to_owned()
+        } else {
+            "majority".to_owned()
+        };
+        println!(
+            "{indent}  {}: {} ({}/{} {})",
+            vote.condition_label, vote.winning_decision, vote.vote_count, vote.total_votes, label
+        );
+    }
 }
 
 fn print_usage(usage: &UsageStats, indent: &str) {

@@ -19,7 +19,7 @@ pub fn execute_trial(client: &OpenAiCompatibleClient, unit: &TrialUnit) -> Resul
 
     let (normalized, grading) = normalize_and_grade(unit, &response.content);
 
-    Ok(TrialResult {
+    let mut result = TrialResult {
         trial_id: unit.id.clone(),
         model_id: unit.model_id.clone(),
         condition_label: unit.condition_label.clone(),
@@ -34,5 +34,41 @@ pub fn execute_trial(client: &OpenAiCompatibleClient, unit: &TrialUnit) -> Resul
         },
         normalized,
         grading,
-    })
+        coercion_response: None,
+        coercion_normalized: None,
+        coercion_grading: None,
+    };
+
+    // If the first turn was a refusal and we have a coercion prompt, send follow-up
+    if result.grading.refusal_present {
+        if let Some(coercion_prompt) = unit.prompt.coercion.as_deref() {
+            let coercion_started = Instant::now();
+            let coercion_response = client.chat_completion_followup(
+                &unit.model_id,
+                unit.prompt.system.as_deref(),
+                unit.prompt.context.as_deref(),
+                &unit.prompt.user,
+                &result.response.content,
+                coercion_prompt,
+            )?;
+            let coercion_elapsed = coercion_started
+                .elapsed()
+                .as_millis()
+                .max(coercion_response.latency_ms);
+
+            let (coercion_norm, coercion_grade) =
+                normalize_and_grade(unit, &coercion_response.content);
+
+            result.coercion_response = Some(RawModelResponse {
+                content: coercion_response.content,
+                tokens_in: coercion_response.tokens_in,
+                tokens_out: coercion_response.tokens_out,
+                latency_ms: coercion_elapsed,
+            });
+            result.coercion_normalized = Some(coercion_norm);
+            result.coercion_grading = Some(coercion_grade);
+        }
+    }
+
+    Ok(result)
 }

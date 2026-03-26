@@ -20,4 +20,6 @@ pub struct ResolvedPrompt {
     pub system: Option<String>,
     pub user: String,
     pub context: Option<String>,
+    #[serde(default)]
+    pub coercion: Option<String>,
 }

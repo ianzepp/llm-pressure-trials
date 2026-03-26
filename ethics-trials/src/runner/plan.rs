@@ -136,6 +136,7 @@ fn resolve_prompt(
         system: scenario.prompt.system.clone(),
         user,
         context: scenario.prompt.context.clone(),
+        coercion: scenario.prompt.coercion.clone(),
     }
 }
 

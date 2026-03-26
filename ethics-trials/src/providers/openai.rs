@@ -56,6 +56,49 @@ impl OpenAiCompatibleClient {
             content: user_content,
         });
 
+        self.complete(model, messages)
+    }
+
+    pub fn chat_completion_followup(
+        &self,
+        model: &str,
+        system: Option<&str>,
+        context: Option<&str>,
+        user: &str,
+        assistant_response: &str,
+        followup: &str,
+    ) -> Result<ProviderResponse> {
+        let mut messages = Vec::new();
+
+        if let Some(system_prompt) = system {
+            messages.push(ChatMessage {
+                role: "system".to_owned(),
+                content: system_prompt.to_owned(),
+            });
+        }
+
+        let user_content = if let Some(context_block) = context {
+            format!("{context_block}\n\n{user}")
+        } else {
+            user.to_owned()
+        };
+        messages.push(ChatMessage {
+            role: "user".to_owned(),
+            content: user_content,
+        });
+        messages.push(ChatMessage {
+            role: "assistant".to_owned(),
+            content: assistant_response.to_owned(),
+        });
+        messages.push(ChatMessage {
+            role: "user".to_owned(),
+            content: followup.to_owned(),
+        });
+
+        self.complete(model, messages)
+    }
+
+    fn complete(&self, model: &str, messages: Vec<ChatMessage>) -> Result<ProviderResponse> {
         let request = ChatCompletionRequest {
             model: model.to_owned(),
             messages,

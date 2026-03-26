@@ -74,6 +74,7 @@ pub fn run(args: GradeArgs) -> Result<()> {
                 system: None,
                 user: String::new(),
                 context: None,
+                coercion: None,
             },
             repetition_index: result.repetition_index,
         };
@@ -81,6 +82,12 @@ pub fn run(args: GradeArgs) -> Result<()> {
         let (normalized, grading) = normalize_and_grade(&stub, &result.response.content);
         result.normalized = normalized;
         result.grading = grading;
+
+        if let Some(coercion_resp) = &result.coercion_response {
+            let (cn, cg) = normalize_and_grade(&stub, &coercion_resp.content);
+            result.coercion_normalized = Some(cn);
+            result.coercion_grading = Some(cg);
+        }
 
         if result.normalized.decision != old_decision {
             decisions_changed += 1;

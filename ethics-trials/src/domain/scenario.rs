@@ -34,6 +34,8 @@ pub struct PromptDefinition {
     pub user: String,
     #[serde(default)]
     pub context: Option<String>,
+    #[serde(default)]
+    pub coercion: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
