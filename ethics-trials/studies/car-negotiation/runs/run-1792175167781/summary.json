@@ -1,0 +1,13 @@
+{
+  "run_id": "run-1792175167781",
+  "study_id": "car-negotiation",
+  "selection": "experiment:car-versions",
+  "total_trials": 24,
+  "successful_trials": 23,
+  "failed_trials": 1,
+  "comparisons": 11,
+  "models": [
+    "deepseek/deepseek-r1-0528",
+    "mistralai/mistral-small-3.2-24b-instruct"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "run_id": "run-1792175988871",
+  "study_id": "drone-doctrine",
+  "selection": "experiment:casualty-sweep",
+  "total_trials": 21,
+  "successful_trials": 21,
+  "failed_trials": 0,
+  "comparisons": 24,
+  "models": [
+    "mistralai/mistral-small-3.2-24b-instruct"
+  ]
+}
