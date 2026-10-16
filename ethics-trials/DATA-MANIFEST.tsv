@@ -51,7 +51,7 @@ ethics-trials/studies/mercy-dilemma/runs/run-1774557774975/summary.json	927	2026
 ethics-trials/studies/mercy-dilemma/runs/run-1774557774975/trial_failures.jsonl	12501	2026-03-26T21:03:31Z	278b54bdbb034f487e9947369dabf518f8e32ff08ac9cc64221a6995a1c218e3
 ethics-trials/studies/mercy-dilemma/runs/run-1774557774975/trial_results.jsonl	2994490	2026-03-26T21:39:53Z	ee44c5ef260ba4aa21158f085391e8434368af8d03073971195624b486c1db8f
 ethics-trials/studies/mercy-dilemma/runs/run-1774557774975/trial_units.json	1710902	2026-03-26T20:42:55Z	a76f6783706cf102222111aab92819d27e598646bbbd34c3f2413c31226e5492
-ethics-trials/studies/mercy-dilemma/sqlite.db	17948672	2026-10-16T17:33:28Z	8c6af24f02d5fcdbbebced217f1385dc5351db3e8c9b2b962d2e9f04055d402e
+ethics-trials/studies/mercy-dilemma/sqlite.db	19779584	2026-10-16T17:37:11Z	dee80a3c293c669d3118a637b95f2ae11c635f0d3f6dea4eb8233ef1dd109c89
 ethics-trials/studies/simple-mercy/runs/run-1774549432748/comparisons.json	961	2026-03-26T18:24:00Z	452b6057e95267ab5e86de7097c9980a12c2a6f29bc7162e99b831ea6f61f425
 ethics-trials/studies/simple-mercy/runs/run-1774549432748/run.json	200	2026-03-26T18:23:52Z	7461e3bfc52fd34a0136b45cea082b3d5e572d433e902dd3a94e645b2f3c73f0
 ethics-trials/studies/simple-mercy/runs/run-1774549432748/summary.json	202	2026-03-26T18:24:00Z	40c5dea861c8536354707237ebb7bdf5cfd4d8cbd037b0c1b123d5e5a326930b
@@ -115,3 +115,9 @@ ethics-trials/studies/mercy-dilemma/runs/run-1792170943373/summary.json	1244	202
 ethics-trials/studies/mercy-dilemma/runs/run-1792170943373/trial_failures.jsonl	6724	2026-10-16T17:29:24Z	f834db59080eafc1b75206238670c1c339b67aa493717bd8f76f66c4b5e6d086
 ethics-trials/studies/mercy-dilemma/runs/run-1792170943373/trial_results.jsonl	7504268	2026-10-16T17:27:19Z	0ded4cb306d066741e3d1477e3909a41d63c1e34c2a142bdc937d347f8d14c85
 ethics-trials/studies/mercy-dilemma/runs/run-1792170943373/trial_units.json	3290780	2026-10-16T17:15:43Z	9c4427170775fab301d2e97a39b93f91b8357fa309d04124ca4e47ac9b550e94
+ethics-trials/studies/mercy-dilemma/runs/run-1792172074513/comparisons.json	36417	2026-10-16T17:37:11Z	0324f2195fb8878556630c3762444009ed29c1af6c9d2a6d976df0eff7edaa69
+ethics-trials/studies/mercy-dilemma/runs/run-1792172074513/pricing.json	4200	2026-10-16T17:34:34Z	148ba282c061b3ea6af3548a3963158ad55e29d089cad14ce44b17a7a0134d17
+ethics-trials/studies/mercy-dilemma/runs/run-1792172074513/run.json	1193	2026-10-16T17:34:34Z	ae601313cf488083930951f723b2b9677b025234af41dedff8aedf906251ae31
+ethics-trials/studies/mercy-dilemma/runs/run-1792172074513/summary.json	1248	2026-10-16T17:37:11Z	a355abac4ecccbe57515aef7d221a933d9313a041b233df16068bfdc085a9fcc
+ethics-trials/studies/mercy-dilemma/runs/run-1792172074513/trial_results.jsonl	1710870	2026-10-16T17:37:11Z	f15822c855d5e14597f480a1b7c204b0696382c405dad0844241aa18a4c8dea3
+ethics-trials/studies/mercy-dilemma/runs/run-1792172074513/trial_units.json	842183	2026-10-16T17:34:34Z	b52d2b3ce462a0d07a9a1e73b8cf09dae20bbc7498fcc09242d8848fac7d5007
