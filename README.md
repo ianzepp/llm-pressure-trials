@@ -22,6 +22,22 @@ re-analyzed and re-run in October 2026.
 Dates are backed by git history, data-file checksums, and session
 transcripts. See [`PROVENANCE.md`](PROVENANCE.md).
 
+## October 2026 findings
+
+- [`docs/findings/grader-delta.md`](docs/findings/grader-delta.md) — the
+  March grader's error, measured: 44 decision↔refusal flips against the
+  corrected two-judge grade (30 on Claude Sonnet 4.6), running in both
+  directions, with the corrected grading stack validated against
+  hand-labeled gold (96% accuracy).
+- [`docs/findings/lane-c.md`](docs/findings/lane-c.md) — the model-effect
+  analysis: anchor stability, format and framing effects, coercion yield,
+  casualty thresholds by tier, escalation arms, the naval comparison,
+  and the budget-silence census.
+- [`docs/findings/predictions-scored.md`](docs/findings/predictions-scored.md) —
+  every pre-registered prediction from
+  [`docs/predictions.md`](docs/predictions.md) scored against the
+  October results, including the misses.
+
 ## Known defect in the original grading
 
 The March 2026 grader extracts decisions with substring matching, and the
