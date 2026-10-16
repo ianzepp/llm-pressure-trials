@@ -12,6 +12,9 @@ dependencies = ["pandas", "pyarrow", "httpx"]
 [project.optional-dependencies]
 dev = ["pytest"]
 
+[project.scripts]
+lp = "llm_pressure.cli:main"
+
 [tool.setuptools]
 packages = ["llm_pressure"]
 

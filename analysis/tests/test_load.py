@@ -101,3 +101,14 @@ def test_real_archive_row_counts():
     initial = df[df["turn"] == "initial"].groupby("study").size().to_dict()
     assert initial == {"mercy-dilemma": 1485, "drone-doctrine": 490, "simple-mercy": 20, "smoke-latency": 388}
     assert (df["turn"] == "coercion").sum() == 195
+
+
+@pytest.mark.skipif(not load.db_path(ROOT, "mercy-dilemma").exists(), reason="archive not present")
+def test_load_grid_restricts_to_the_four_march_runs():
+    df = load.load_grid(ROOT)
+    for study, runs in load.GRID_RUNS.items():
+        got = set(df[df["study"] == study]["run_id"])
+        assert got == set(runs)
+    assert set(df["study"]) <= set(load.GRID_RUNS)
+    # 504 mercy + 461+15+9 drone trials produce 1095 turn rows.
+    assert len(df) == 1095

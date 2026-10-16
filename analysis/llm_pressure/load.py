@@ -26,6 +26,13 @@ STUDY_DECISIONS: dict[str, tuple[str, ...]] = {
 }
 
 TURNS = ("initial", "coercion", "escalation", "followup")
+
+# The four March 2026 runs in the re-analysis grid (docs/grid-plan.md,
+# "Original runs"). Lane A regrades exactly these.
+GRID_RUNS: dict[str, tuple[str, ...]] = {
+    "mercy-dilemma": ("run-1774557774975",),
+    "drone-doctrine": ("run-1774562150016", "run-1774567427517", "run-1774568254306"),
+}
 _PREFIX = {"initial": "", "coercion": "coercion_", "escalation": "escalation_", "followup": "followup_"}
 _CONTENT_COL = {"initial": "response_content"}
 
@@ -195,3 +202,11 @@ def load_all(root: Path | None = None, studies: tuple[str, ...] = STUDIES) -> pd
     df = pd.concat(frames, ignore_index=True)
     df["repetition_index"] = df["repetition_index"].astype("int64")
     return df
+
+
+def load_grid(root: Path | None = None, studies: tuple[str, ...] | None = None) -> pd.DataFrame:
+    """The four March 2026 grid runs only (Lane A input)."""
+    studies = studies or tuple(GRID_RUNS)
+    df = load_all(root, studies)
+    mask = df.apply(lambda r: r["run_id"] in GRID_RUNS.get(r["study"], ()), axis=1)
+    return df[mask].reset_index(drop=True)
