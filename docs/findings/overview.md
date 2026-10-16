@@ -88,7 +88,9 @@ T4, `predictions-scored.md` §5, §10.
 
 **F9 — Silence is budget, not safety.** 849 of 861 October no-answer
 rows are the 800-token budget exhausted by reasoning (`length`), not
-classifier blocks — October shows **zero** content-filter blocks. Six
+classifier blocks. The other 12 are content-filter blocks, all
+`nova-micro-v1` on the drone study; no Claude model has a single
+content-filter row. Six
 models are effectively silenced by the cap (qwen3.8-max 145 rows,
 glm-5.3 119, …). March logged no finish reasons, so this census is
 October-only. → `lane-c.md` T10, `predictions-scored.md` §3a.
