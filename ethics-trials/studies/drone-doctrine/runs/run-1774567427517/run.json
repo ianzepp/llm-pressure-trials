@@ -1,0 +1,9 @@
+{
+  "run_id": "run-1774567427517",
+  "study_id": "drone-doctrine",
+  "selection": "experiment:framing-probe",
+  "models": [
+    "anthropic/claude-sonnet-4.6"
+  ],
+  "created_at_unix_ms": 1774567427517
+}

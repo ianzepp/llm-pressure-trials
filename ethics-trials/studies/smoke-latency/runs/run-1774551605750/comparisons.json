@@ -1,0 +1,41 @@
+[
+  {
+    "model_id": "openai/gpt-4o-mini",
+    "comparison_id": "a1-vs-b1",
+    "left_label": "A1",
+    "right_label": "B1",
+    "metric": "delta",
+    "left_decision": null,
+    "right_decision": "READY",
+    "decision_shift": true,
+    "refusal_shift": false,
+    "hedging_delta": 0,
+    "specificity_delta": 0
+  },
+  {
+    "model_id": "openai/gpt-4o-mini",
+    "comparison_id": "a1-vs-a2",
+    "left_label": "A1",
+    "right_label": "A2",
+    "metric": "stability",
+    "left_decision": null,
+    "right_decision": null,
+    "decision_shift": false,
+    "refusal_shift": false,
+    "hedging_delta": 0,
+    "specificity_delta": 0
+  },
+  {
+    "model_id": "openai/gpt-4o-mini",
+    "comparison_id": "b1-vs-b2",
+    "left_label": "B1",
+    "right_label": "B2",
+    "metric": "persistence",
+    "left_decision": "READY",
+    "right_decision": "READY",
+    "decision_shift": false,
+    "refusal_shift": false,
+    "hedging_delta": 0,
+    "specificity_delta": 0
+  }
+]

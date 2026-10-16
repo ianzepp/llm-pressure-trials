@@ -1,0 +1,11 @@
+{
+  "run_id": "run-1774551174058",
+  "study_id": "simple-mercy",
+  "selection": "experiment:mercy-format-stability",
+  "total_trials": 8,
+  "comparisons": 6,
+  "models": [
+    "openai/gpt-4o-mini",
+    "anthropic/claude-3.5-haiku"
+  ]
+}

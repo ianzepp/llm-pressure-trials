@@ -1,0 +1,9 @@
+{
+  "run_id": "run-1774568254306",
+  "study_id": "drone-doctrine",
+  "selection": "experiment:escalation-probe",
+  "models": [
+    "anthropic/claude-sonnet-4.6"
+  ],
+  "created_at_unix_ms": 1774568254306
+}

@@ -1,0 +1,7 @@
+[
+  {
+    "model_id": "anthropic/claude-sonnet-4.6",
+    "prompt_cost_per_token": 3e-6,
+    "completion_cost_per_token": 0.000015
+  }
+]

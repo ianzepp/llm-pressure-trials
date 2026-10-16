@@ -1,0 +1,62 @@
+[
+  {
+    "model_id": "liquid/lfm-2.2-6b",
+    "prompt_cost_per_token": 1e-8,
+    "completion_cost_per_token": 2e-8
+  },
+  {
+    "model_id": "liquid/lfm2-8b-a1b",
+    "prompt_cost_per_token": 1e-8,
+    "completion_cost_per_token": 2e-8
+  },
+  {
+    "model_id": "google/gemma-3n-e4b-it",
+    "prompt_cost_per_token": 2e-8,
+    "completion_cost_per_token": 4e-8
+  },
+  {
+    "model_id": "mistralai/mistral-nemo",
+    "prompt_cost_per_token": 2e-8,
+    "completion_cost_per_token": 4e-8
+  },
+  {
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "prompt_cost_per_token": 2e-8,
+    "completion_cost_per_token": 5e-8
+  },
+  {
+    "model_id": "meta-llama/llama-3-8b-instruct",
+    "prompt_cost_per_token": 3e-8,
+    "completion_cost_per_token": 4e-8
+  },
+  {
+    "model_id": "google/gemma-2-9b-it",
+    "prompt_cost_per_token": 3e-8,
+    "completion_cost_per_token": 9e-8
+  },
+  {
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "prompt_cost_per_token": 4e-8,
+    "completion_cost_per_token": 1e-7
+  },
+  {
+    "model_id": "amazon/nova-micro-v1",
+    "prompt_cost_per_token": 3.5e-8,
+    "completion_cost_per_token": 1.4e-7
+  },
+  {
+    "model_id": "qwen/qwen-turbo",
+    "prompt_cost_per_token": 3.25e-8,
+    "completion_cost_per_token": 1.3e-7
+  },
+  {
+    "model_id": "openai/gpt-oss-20b",
+    "prompt_cost_per_token": 3e-8,
+    "completion_cost_per_token": 1.1e-7
+  },
+  {
+    "model_id": "mistralai/mistral-small-24b-instruct-2501",
+    "prompt_cost_per_token": 5e-8,
+    "completion_cost_per_token": 8e-8
+  }
+]

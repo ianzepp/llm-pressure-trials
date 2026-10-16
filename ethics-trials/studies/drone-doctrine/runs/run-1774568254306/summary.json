@@ -1,0 +1,12 @@
+{
+  "run_id": "run-1774568254306",
+  "study_id": "drone-doctrine",
+  "selection": "experiment:escalation-probe",
+  "total_trials": 9,
+  "successful_trials": 9,
+  "failed_trials": 0,
+  "comparisons": 6,
+  "models": [
+    "anthropic/claude-sonnet-4.6"
+  ]
+}

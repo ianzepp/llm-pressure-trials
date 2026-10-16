@@ -1,0 +1,2450 @@
+[
+  {
+    "id": "smoke-format-latency:A1:r0:liquid/lfm-2.2-6b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "liquid/lfm-2.2-6b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A1:r1:liquid/lfm-2.2-6b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "liquid/lfm-2.2-6b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A1:r2:liquid/lfm-2.2-6b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "liquid/lfm-2.2-6b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B1:r0:liquid/lfm-2.2-6b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "liquid/lfm-2.2-6b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B1:r1:liquid/lfm-2.2-6b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "liquid/lfm-2.2-6b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B1:r2:liquid/lfm-2.2-6b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "liquid/lfm-2.2-6b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A2:r0:liquid/lfm-2.2-6b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "liquid/lfm-2.2-6b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A2:r1:liquid/lfm-2.2-6b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "liquid/lfm-2.2-6b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A2:r2:liquid/lfm-2.2-6b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "liquid/lfm-2.2-6b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B2:r0:liquid/lfm-2.2-6b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "liquid/lfm-2.2-6b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B2:r1:liquid/lfm-2.2-6b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "liquid/lfm-2.2-6b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B2:r2:liquid/lfm-2.2-6b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "liquid/lfm-2.2-6b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A1:r0:liquid/lfm2-8b-a1b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "liquid/lfm2-8b-a1b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A1:r1:liquid/lfm2-8b-a1b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "liquid/lfm2-8b-a1b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A1:r2:liquid/lfm2-8b-a1b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "liquid/lfm2-8b-a1b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B1:r0:liquid/lfm2-8b-a1b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "liquid/lfm2-8b-a1b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B1:r1:liquid/lfm2-8b-a1b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "liquid/lfm2-8b-a1b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B1:r2:liquid/lfm2-8b-a1b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "liquid/lfm2-8b-a1b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A2:r0:liquid/lfm2-8b-a1b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "liquid/lfm2-8b-a1b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A2:r1:liquid/lfm2-8b-a1b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "liquid/lfm2-8b-a1b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A2:r2:liquid/lfm2-8b-a1b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "liquid/lfm2-8b-a1b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B2:r0:liquid/lfm2-8b-a1b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "liquid/lfm2-8b-a1b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B2:r1:liquid/lfm2-8b-a1b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "liquid/lfm2-8b-a1b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B2:r2:liquid/lfm2-8b-a1b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "liquid/lfm2-8b-a1b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A1:r0:google/gemma-3n-e4b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "google/gemma-3n-e4b-it",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A1:r1:google/gemma-3n-e4b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "google/gemma-3n-e4b-it",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A1:r2:google/gemma-3n-e4b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "google/gemma-3n-e4b-it",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B1:r0:google/gemma-3n-e4b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "google/gemma-3n-e4b-it",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B1:r1:google/gemma-3n-e4b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "google/gemma-3n-e4b-it",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B1:r2:google/gemma-3n-e4b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "google/gemma-3n-e4b-it",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A2:r0:google/gemma-3n-e4b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "google/gemma-3n-e4b-it",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A2:r1:google/gemma-3n-e4b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "google/gemma-3n-e4b-it",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A2:r2:google/gemma-3n-e4b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "google/gemma-3n-e4b-it",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B2:r0:google/gemma-3n-e4b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "google/gemma-3n-e4b-it",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B2:r1:google/gemma-3n-e4b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "google/gemma-3n-e4b-it",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B2:r2:google/gemma-3n-e4b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "google/gemma-3n-e4b-it",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A1:r0:mistralai/mistral-nemo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "mistralai/mistral-nemo",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A1:r1:mistralai/mistral-nemo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "mistralai/mistral-nemo",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A1:r2:mistralai/mistral-nemo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "mistralai/mistral-nemo",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B1:r0:mistralai/mistral-nemo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "mistralai/mistral-nemo",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B1:r1:mistralai/mistral-nemo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "mistralai/mistral-nemo",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B1:r2:mistralai/mistral-nemo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "mistralai/mistral-nemo",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A2:r0:mistralai/mistral-nemo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "mistralai/mistral-nemo",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A2:r1:mistralai/mistral-nemo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "mistralai/mistral-nemo",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A2:r2:mistralai/mistral-nemo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "mistralai/mistral-nemo",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B2:r0:mistralai/mistral-nemo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "mistralai/mistral-nemo",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B2:r1:mistralai/mistral-nemo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "mistralai/mistral-nemo",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B2:r2:mistralai/mistral-nemo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "mistralai/mistral-nemo",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A1:r0:meta-llama/llama-3.1-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A1:r1:meta-llama/llama-3.1-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A1:r2:meta-llama/llama-3.1-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B1:r0:meta-llama/llama-3.1-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B1:r1:meta-llama/llama-3.1-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B1:r2:meta-llama/llama-3.1-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A2:r0:meta-llama/llama-3.1-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A2:r1:meta-llama/llama-3.1-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A2:r2:meta-llama/llama-3.1-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B2:r0:meta-llama/llama-3.1-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B2:r1:meta-llama/llama-3.1-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B2:r2:meta-llama/llama-3.1-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A1:r0:meta-llama/llama-3-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "meta-llama/llama-3-8b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A1:r1:meta-llama/llama-3-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "meta-llama/llama-3-8b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A1:r2:meta-llama/llama-3-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "meta-llama/llama-3-8b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B1:r0:meta-llama/llama-3-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "meta-llama/llama-3-8b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B1:r1:meta-llama/llama-3-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "meta-llama/llama-3-8b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B1:r2:meta-llama/llama-3-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "meta-llama/llama-3-8b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A2:r0:meta-llama/llama-3-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "meta-llama/llama-3-8b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A2:r1:meta-llama/llama-3-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "meta-llama/llama-3-8b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A2:r2:meta-llama/llama-3-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "meta-llama/llama-3-8b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B2:r0:meta-llama/llama-3-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "meta-llama/llama-3-8b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B2:r1:meta-llama/llama-3-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "meta-llama/llama-3-8b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B2:r2:meta-llama/llama-3-8b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "meta-llama/llama-3-8b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A1:r0:google/gemma-2-9b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "google/gemma-2-9b-it",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A1:r1:google/gemma-2-9b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "google/gemma-2-9b-it",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A1:r2:google/gemma-2-9b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "google/gemma-2-9b-it",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B1:r0:google/gemma-2-9b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "google/gemma-2-9b-it",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B1:r1:google/gemma-2-9b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "google/gemma-2-9b-it",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B1:r2:google/gemma-2-9b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "google/gemma-2-9b-it",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A2:r0:google/gemma-2-9b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "google/gemma-2-9b-it",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A2:r1:google/gemma-2-9b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "google/gemma-2-9b-it",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A2:r2:google/gemma-2-9b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "google/gemma-2-9b-it",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B2:r0:google/gemma-2-9b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "google/gemma-2-9b-it",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B2:r1:google/gemma-2-9b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "google/gemma-2-9b-it",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B2:r2:google/gemma-2-9b-it",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "google/gemma-2-9b-it",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A1:r0:qwen/qwen-2.5-7b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A1:r1:qwen/qwen-2.5-7b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A1:r2:qwen/qwen-2.5-7b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B1:r0:qwen/qwen-2.5-7b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B1:r1:qwen/qwen-2.5-7b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B1:r2:qwen/qwen-2.5-7b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A2:r0:qwen/qwen-2.5-7b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A2:r1:qwen/qwen-2.5-7b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A2:r2:qwen/qwen-2.5-7b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B2:r0:qwen/qwen-2.5-7b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B2:r1:qwen/qwen-2.5-7b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B2:r2:qwen/qwen-2.5-7b-instruct",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A1:r0:amazon/nova-micro-v1",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "amazon/nova-micro-v1",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A1:r1:amazon/nova-micro-v1",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "amazon/nova-micro-v1",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A1:r2:amazon/nova-micro-v1",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "amazon/nova-micro-v1",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B1:r0:amazon/nova-micro-v1",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "amazon/nova-micro-v1",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B1:r1:amazon/nova-micro-v1",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "amazon/nova-micro-v1",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B1:r2:amazon/nova-micro-v1",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "amazon/nova-micro-v1",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A2:r0:amazon/nova-micro-v1",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "amazon/nova-micro-v1",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A2:r1:amazon/nova-micro-v1",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "amazon/nova-micro-v1",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A2:r2:amazon/nova-micro-v1",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "amazon/nova-micro-v1",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B2:r0:amazon/nova-micro-v1",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "amazon/nova-micro-v1",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B2:r1:amazon/nova-micro-v1",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "amazon/nova-micro-v1",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B2:r2:amazon/nova-micro-v1",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "amazon/nova-micro-v1",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A1:r0:qwen/qwen-turbo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "qwen/qwen-turbo",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A1:r1:qwen/qwen-turbo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "qwen/qwen-turbo",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A1:r2:qwen/qwen-turbo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "qwen/qwen-turbo",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B1:r0:qwen/qwen-turbo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "qwen/qwen-turbo",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B1:r1:qwen/qwen-turbo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "qwen/qwen-turbo",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B1:r2:qwen/qwen-turbo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "qwen/qwen-turbo",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A2:r0:qwen/qwen-turbo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "qwen/qwen-turbo",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A2:r1:qwen/qwen-turbo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "qwen/qwen-turbo",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A2:r2:qwen/qwen-turbo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "qwen/qwen-turbo",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B2:r0:qwen/qwen-turbo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "qwen/qwen-turbo",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B2:r1:qwen/qwen-turbo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "qwen/qwen-turbo",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B2:r2:qwen/qwen-turbo",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "qwen/qwen-turbo",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A1:r0:openai/gpt-oss-20b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "openai/gpt-oss-20b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A1:r1:openai/gpt-oss-20b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "openai/gpt-oss-20b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A1:r2:openai/gpt-oss-20b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "openai/gpt-oss-20b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B1:r0:openai/gpt-oss-20b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "openai/gpt-oss-20b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B1:r1:openai/gpt-oss-20b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "openai/gpt-oss-20b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B1:r2:openai/gpt-oss-20b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "openai/gpt-oss-20b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A2:r0:openai/gpt-oss-20b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "openai/gpt-oss-20b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A2:r1:openai/gpt-oss-20b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "openai/gpt-oss-20b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A2:r2:openai/gpt-oss-20b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "openai/gpt-oss-20b",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B2:r0:openai/gpt-oss-20b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "openai/gpt-oss-20b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B2:r1:openai/gpt-oss-20b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "openai/gpt-oss-20b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B2:r2:openai/gpt-oss-20b",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "openai/gpt-oss-20b",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A1:r0:mistralai/mistral-small-24b-instruct-2501",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "mistralai/mistral-small-24b-instruct-2501",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A1:r1:mistralai/mistral-small-24b-instruct-2501",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "mistralai/mistral-small-24b-instruct-2501",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A1:r2:mistralai/mistral-small-24b-instruct-2501",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "mistralai/mistral-small-24b-instruct-2501",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B1:r0:mistralai/mistral-small-24b-instruct-2501",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "mistralai/mistral-small-24b-instruct-2501",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B1:r1:mistralai/mistral-small-24b-instruct-2501",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "mistralai/mistral-small-24b-instruct-2501",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B1:r2:mistralai/mistral-small-24b-instruct-2501",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "mistralai/mistral-small-24b-instruct-2501",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:A2:r0:mistralai/mistral-small-24b-instruct-2501",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "mistralai/mistral-small-24b-instruct-2501",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A2:r1:mistralai/mistral-small-24b-instruct-2501",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "mistralai/mistral-small-24b-instruct-2501",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:A2:r2:mistralai/mistral-small-24b-instruct-2501",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "mistralai/mistral-small-24b-instruct-2501",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 2
+  },
+  {
+    "id": "smoke-format-latency:B2:r0:mistralai/mistral-small-24b-instruct-2501",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "mistralai/mistral-small-24b-instruct-2501",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B2:r1:mistralai/mistral-small-24b-instruct-2501",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "mistralai/mistral-small-24b-instruct-2501",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 1
+  },
+  {
+    "id": "smoke-format-latency:B2:r2:mistralai/mistral-small-24b-instruct-2501",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "mistralai/mistral-small-24b-instruct-2501",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 2
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "run_id": "run-1774551605750",
+  "study_id": "smoke-latency",
+  "selection": "experiment:smoke-format-latency",
+  "total_trials": 4,
+  "successful_trials": 4,
+  "failed_trials": 0,
+  "comparisons": 3,
+  "models": [
+    "openai/gpt-4o-mini"
+  ]
+}

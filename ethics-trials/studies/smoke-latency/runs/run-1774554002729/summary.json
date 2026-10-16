@@ -1,0 +1,23 @@
+{
+  "run_id": "run-1774554002729",
+  "study_id": "smoke-latency",
+  "selection": "experiment:smoke-format-latency",
+  "total_trials": 144,
+  "successful_trials": 144,
+  "failed_trials": 0,
+  "comparisons": 108,
+  "models": [
+    "amazon/nova-micro-v1",
+    "google/gemma-2-9b-it",
+    "google/gemma-3n-e4b-it",
+    "liquid/lfm-2.2-6b",
+    "liquid/lfm2-8b-a1b",
+    "meta-llama/llama-3-8b-instruct",
+    "meta-llama/llama-3.1-8b-instruct",
+    "mistralai/mistral-nemo",
+    "mistralai/mistral-small-24b-instruct-2501",
+    "openai/gpt-oss-20b",
+    "qwen/qwen-2.5-7b-instruct",
+    "qwen/qwen-turbo"
+  ]
+}

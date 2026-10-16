@@ -5,10 +5,7 @@
 .env.*
 .cache/
 
-# Local run artifacts
-studies/*/runs/
-studies/*/results/
-studies/*/sqlite.db
+# Run artifacts are committed: they are the research record.
 
 # Editor cruft
 .DS_Store

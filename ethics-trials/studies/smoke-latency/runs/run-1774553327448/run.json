@@ -1,0 +1,20 @@
+{
+  "run_id": "run-1774553327448",
+  "study_id": "smoke-latency",
+  "selection": "experiment:smoke-format-latency",
+  "models": [
+    "liquid/lfm-2.2-6b",
+    "liquid/lfm2-8b-a1b",
+    "google/gemma-3n-e4b-it",
+    "mistralai/mistral-nemo",
+    "meta-llama/llama-3.1-8b-instruct",
+    "meta-llama/llama-3-8b-instruct",
+    "google/gemma-2-9b-it",
+    "qwen/qwen-2.5-7b-instruct",
+    "amazon/nova-micro-v1",
+    "qwen/qwen-turbo",
+    "openai/gpt-oss-20b",
+    "mistralai/mistral-small-24b-instruct-2501"
+  ],
+  "created_at_unix_ms": 1774553327448
+}

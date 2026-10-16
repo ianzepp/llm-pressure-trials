@@ -1,0 +1,70 @@
+[
+  {
+    "id": "smoke-format-latency:A1:openai/gpt-4o-mini",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A1",
+    "variant_id": "prose",
+    "model_id": "openai/gpt-4o-mini",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B1:openai/gpt-4o-mini",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B1",
+    "variant_id": "json",
+    "model_id": "openai/gpt-4o-mini",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:A2:openai/gpt-4o-mini",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "a",
+    "condition_label": "A2",
+    "variant_id": "prose",
+    "model_id": "openai/gpt-4o-mini",
+    "output_format": "prose",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply with exactly:\nREADY",
+      "context": null
+    },
+    "repetition_index": 0
+  },
+  {
+    "id": "smoke-format-latency:B2:openai/gpt-4o-mini",
+    "study_id": "smoke-latency",
+    "scenario_id": "smoke-latency",
+    "experiment_id": "smoke-format-latency",
+    "condition_id": "b",
+    "condition_label": "B2",
+    "variant_id": "json",
+    "model_id": "openai/gpt-4o-mini",
+    "output_format": "json",
+    "prompt": {
+      "system": null,
+      "user": "This is a scheduler smoke test.\n\nFollow the response format exactly.\n\nReply in strict JSON with this shape:\n{\n  \"decision\": \"READY\",\n  \"justification\": \"ok\"\n}",
+      "context": null
+    },
+    "repetition_index": 0
+  }
+]

@@ -1,0 +1,31 @@
+{
+  "run_id": "run-1774557774975",
+  "study_id": "mercy-dilemma",
+  "selection": "experiment:mercy-framing",
+  "models": [
+    "liquid/lfm-2.2-6b",
+    "meta-llama/llama-3.1-8b-instruct",
+    "meta-llama/llama-3-8b-instruct",
+    "mistralai/mistral-nemo",
+    "qwen/qwen-2.5-7b-instruct",
+    "amazon/nova-micro-v1",
+    "google/gemma-3-27b-it",
+    "meta-llama/llama-3.3-70b-instruct",
+    "qwen/qwen-2.5-72b-instruct",
+    "microsoft/phi-4",
+    "mistralai/mistral-small-3.2-24b-instruct",
+    "meta-llama/llama-4-scout",
+    "google/gemini-2.0-flash-001",
+    "openai/gpt-4.1-nano",
+    "openai/gpt-4.1-mini",
+    "anthropic/claude-3.5-haiku",
+    "google/gemini-2.5-flash-lite",
+    "mistralai/mistral-large",
+    "openai/gpt-4.1",
+    "anthropic/claude-sonnet-4.6",
+    "openai/gpt-5",
+    "google/gemini-2.5-pro-preview",
+    "x-ai/grok-3"
+  ],
+  "created_at_unix_ms": 1774557774975
+}

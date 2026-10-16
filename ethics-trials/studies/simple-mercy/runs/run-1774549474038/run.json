@@ -1,0 +1,9 @@
+{
+  "run_id": "run-1774549474038",
+  "study_id": "simple-mercy",
+  "selection": "experiment:mercy-format-stability",
+  "models": [
+    "openai/gpt-4o-mini"
+  ],
+  "created_at_unix_ms": 1774549474038
+}

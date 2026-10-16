@@ -1,0 +1,12 @@
+{
+  "run_id": "run-1774567427517",
+  "study_id": "drone-doctrine",
+  "selection": "experiment:framing-probe",
+  "total_trials": 15,
+  "successful_trials": 15,
+  "failed_trials": 0,
+  "comparisons": 18,
+  "models": [
+    "anthropic/claude-sonnet-4.6"
+  ]
+}
