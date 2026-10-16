@@ -24,7 +24,7 @@ ethics-trials/studies/drone-doctrine/runs/run-1774568254306/run.json	205	2026-03
 ethics-trials/studies/drone-doctrine/runs/run-1774568254306/summary.json	255	2026-03-26T23:40:54Z	75a9adc61c22fc5f95c90c06dbe342e8b8968a4c96668bb02231057de258d190
 ethics-trials/studies/drone-doctrine/runs/run-1774568254306/trial_results.jsonl	94425	2026-03-26T23:40:54Z	7ec08fb2e508922b412e9ffd63975fd3202805e56f41ea1e74556fae73449e7e
 ethics-trials/studies/drone-doctrine/runs/run-1774568254306/trial_units.json	29897	2026-03-26T23:37:34Z	4357230bb1871e6bd153ae5d1ed2aaa189e469f971bcae9f53e47fc92dd62af8
-ethics-trials/studies/drone-doctrine/sqlite.db	23801856	2026-10-16T18:18:19Z	7b094bb2fe4bc4f9f7c22ea3b268d5a70f451047133763742ab9810c4191439c
+ethics-trials/studies/drone-doctrine/sqlite.db	26886144	2026-10-16T18:24:55Z	ce030eb2dcc21391c54431029cda8a053f57bd0ba935b2cc00e73e8c5b933641
 ethics-trials/studies/mercy-dilemma/runs/run-1774554596495/comparisons.json	111448	2026-03-26T20:11:23Z	d5d6e4aa61e39a6a23c33dbbb6cbca7150d87d77e8010de350e097a68b163146
 ethics-trials/studies/mercy-dilemma/runs/run-1774554596495/pricing.json	1517	2026-03-26T19:49:56Z	51c1213ef08418723c6011a403c839195841e42d0457d5a2a8f0a2a964e46ebd
 ethics-trials/studies/mercy-dilemma/runs/run-1774554596495/run.json	542	2026-03-26T19:49:56Z	69e1ec693726a056acc95f30d8f59b2102b708be1d16a5c531b7b3b50fea7486
@@ -157,3 +157,10 @@ ethics-trials/studies/drone-doctrine/runs/run-1792174295161/summary.json	1246	20
 ethics-trials/studies/drone-doctrine/runs/run-1792174295161/trial_failures.jsonl	6992	2026-10-16T18:12:43Z	213c7663b0866b113d0f13af2de50bb9ca0548b947ac0bff2b7fd1f65df2e55a
 ethics-trials/studies/drone-doctrine/runs/run-1792174295161/trial_results.jsonl	3181346	2026-10-16T18:18:18Z	b0e546ea004df16bd302b21154b7f0e045bd5e91e265937497368af6c99e3d2a
 ethics-trials/studies/drone-doctrine/runs/run-1792174295161/trial_units.json	749222	2026-10-16T18:11:35Z	9edad98acad97805c7c1af8a5878c8128ad222df9b01506e4b65f923f5b8151c
+ethics-trials/studies/drone-doctrine/runs/run-1792174718966/comparisons.json	37714	2026-10-16T18:24:55Z	9a5823b3c99d8c7b0e1e5202bb34ed4aa90d58fbfe70441f104587d740c177df
+ethics-trials/studies/drone-doctrine/runs/run-1792174718966/pricing.json	4200	2026-10-16T18:18:38Z	148ba282c061b3ea6af3548a3963158ad55e29d089cad14ce44b17a7a0134d17
+ethics-trials/studies/drone-doctrine/runs/run-1792174718966/run.json	1185	2026-10-16T18:18:38Z	932748e034d7ff5e62c4b4b089c4cb494c7cf6ddc4bbdff1d293047e2ff412e1
+ethics-trials/studies/drone-doctrine/runs/run-1792174718966/summary.json	1240	2026-10-16T18:24:55Z	3d4960c666f465b235183995e89106ffced882062793499e4ff992d675556077
+ethics-trials/studies/drone-doctrine/runs/run-1792174718966/trial_failures.jsonl	1634	2026-10-16T18:21:01Z	0364d140172a685664e74c8542e0376a3d18e09e8d8513a167b721718f990dc8
+ethics-trials/studies/drone-doctrine/runs/run-1792174718966/trial_results.jsonl	2990852	2026-10-16T18:24:55Z	e3588d0d37c55f3271e029fa75ce02bde37ad2ac7a229b5b8a7e542ca7da66ae
+ethics-trials/studies/drone-doctrine/runs/run-1792174718966/trial_units.json	618938	2026-10-16T18:18:38Z	46d5adf3f490e324cc24233918489030801ddcf20ce26e32fed9663ffa91b5b3
