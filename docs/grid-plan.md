@@ -96,19 +96,53 @@ so it can run in parallel.
     sampling noise. This gives the noise floor.
   - *Retired:* claude-3.5-haiku, gemini-2.0-flash-001, lfm-2.2-6b,
     llama-3-8b-instruct, grok-3. These cannot be rerun.
-  - *Successors:* the current model in each lineage. Proposed:
-    claude-haiku-5.5, claude-sonnet-5.5, claude-opus-5.5, gpt-6.1-sol,
-    gpt-6-luna-pro, gemini-4-argon, gemini-3.8-flash, grok-4.7,
-    mistral-large-4-0, qwen3.8-flash, qwen3.8-max-0902,
-    deepseek-v4.1-flash, glm-5.3, kimi-k3, lfm-2.5-24b-a2b. This list
-    needs the operator's choice.
+  - *Successors:* the current model in each lineage, released after
+    2026-03-26 (agreed 2026-10-16). Mapping is by lineage and price
+    tier from the OpenRouter catalog; prices are $ per million tokens,
+    input/output.
+
+    | March model(s) | Successor | Released | Price |
+    | --- | --- | --- | --- |
+    | claude-3.5-haiku (retired) | `anthropic/claude-haiku-5.5` | 2026-10-07 | 0.10 / 0.50 |
+    | claude-sonnet-4.6 | `anthropic/claude-sonnet-5.5` | 2026-09-28 | 2.00 / 10.00 |
+    | none in March (Opus 4.5 in January) | `anthropic/claude-opus-5.5` | 2026-09-22 | 4.00 / 20.00 |
+    | gpt-4.1 | `openai/gpt-6.1-sol` | 2026-09-29 | 2.00 / 10.00 |
+    | gpt-4.1-mini, gpt-4.1-nano | `openai/gpt-6-luna-pro` | 2026-09-22 | 0.10 / 0.50 |
+    | gemini-2.5-pro-preview | `google/gemini-4-argon` | 2026-10-13 | 2.00 / 10.00 |
+    | gemini-2.5-flash-lite, gemini-2.0-flash-001 (retired) | `google/gemini-3.8-flash` | 2026-09-02 | 0.83 / 4.12 |
+    | gemma-3-27b-it | `google/gemma-4-31b-it` | 2026-04-02 | 0.20 / 0.40 |
+    | grok-3 (retired) | `x-ai/grok-4.7` | 2026-09-21 | 2.00 / 6.00 |
+    | mistral-large | `mistralai/mistral-large-4-0` | 2026-10-06 | 0.68 / 2.09 |
+    | qwen-2.5-72b-instruct | `qwen/qwen3.8-max-0902` | 2026-09-03 | 2.00 / 6.00 |
+    | qwen-2.5-7b-instruct | `qwen/qwen3.8-flash` | 2026-08-26 | 0.15 / 0.47 |
+    | lfm-2.2-6b (retired) | `liquid/lfm-2.5-24b-a2b` | 2026-10-13 | 0.05 / 0.70 |
+
+    No successor released after March: the Llama models (newest is
+    April 2025), phi-4, nova-micro-v1, mistral-small-3.2, and
+    mistral-nemo. These stay as anchors only.
+
+    The tier mapping (for example, gpt-6-luna-pro as the small OpenAI
+    tier) is inferred from price, not from published capability data.
+    The Opus row has no March predecessor, so it compares against
+    Sonnet 4.6 and the January Opus 4.5 notes, not a March run.
+  - *New families:* models with no March predecessor (agreed
+    2026-10-16). They extend the October snapshot but cannot show change
+    since March, so Lane C reports them separately from the model-delta
+    comparison.
+
+    | Model | Released | Price |
+    | --- | --- | --- |
+    | `z-ai/glm-5.3` | 2026-08-18 | 0.08 / 4.80 |
+    | `z-ai/glm-5.3-flash` | 2026-08-26 | 0.02 / 0.71 |
+    | `deepseek/deepseek-v4.1-flash` | 2026-09-10 | 0.15 / 0.60 |
 - **Probes.** Rerun the framing and escalation probes on Sonnet 4.6 as an
   anchor, and on its successors.
 - **Outputs.** New runs under `studies/*/runs/`, committed as produced,
   and an updated data manifest.
-- **Cost.** The original runs cost $0.88 (mercy) and $0.54 (drone). The
-  successors are pricier, so the estimate is $5 to $15 including the
-  judge pass. Set a $25 cap.
+- **Cost.** 33 models in total: 17 anchors, 13 successors, and 3 new
+  families. The original 22-model runs cost $0.88 (mercy) and $0.54
+  (drone). The successors are pricier, so the estimate is $5 to $15
+  including the judge pass. Set a $25 cap.
 - **Time.** The original runs took about an hour per study. Each study
   is one background command; capture the measured time.
 
