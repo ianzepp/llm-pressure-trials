@@ -24,6 +24,9 @@ transcripts. See [`PROVENANCE.md`](PROVENANCE.md).
 
 ## October 2026 findings
 
+Start with [`docs/findings/overview.md`](docs/findings/overview.md) —
+the one-page summary of every finding with pointers into the detail:
+
 - [`docs/findings/grader-delta.md`](docs/findings/grader-delta.md) — the
   March grader's error, measured: 44 decision↔refusal flips against the
   corrected two-judge grade (30 on Claude Sonnet 4.6), running in both
