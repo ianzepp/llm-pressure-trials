@@ -12,6 +12,7 @@ use crate::domain::result::{ComparisonResult, FailedTrial, RunMetadata, RunSumma
 use crate::domain::trial::TrialUnit;
 use crate::loader::studies::LoadedStudy;
 use crate::providers::openai::OpenAiCompatibleClient;
+use crate::providers::types::raw_body_of;
 use crate::runner::compare::compare_results;
 use crate::runner::execute::{JudgeConfig, execute_trial};
 use crate::runner::plan::{expand_experiment, expand_scenario};
@@ -185,6 +186,7 @@ pub fn execute_run_request(
                         model_id: message.model_id.clone(),
                         condition_label: message.condition_label.clone(),
                         error: format!("{error:#}"),
+                        raw_body: raw_body_of(&error),
                     };
                     emit_jsonl_event(
                         jsonl,
@@ -338,6 +340,7 @@ pub fn execute_run_request(
                             model_id: message.model_id.clone(),
                             condition_label: message.condition_label.clone(),
                             error: format!("{error:#}"),
+                        raw_body: raw_body_of(&error),
                         };
                         emit_jsonl_event(
                             jsonl,

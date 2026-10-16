@@ -41,6 +41,16 @@ pub fn validate_study(study: &LoadedStudy) -> Result<()> {
         }
     }
 
+    let mut coercion_variant_ids = HashSet::new();
+    for variant in &scenario.prompt.coercion_variants {
+        if variant.id.trim().is_empty() {
+            bail!("coercion_variants entries must have a non-empty id");
+        }
+        if !coercion_variant_ids.insert(variant.id.as_str()) {
+            bail!("duplicate coercion variant id `{}`", variant.id);
+        }
+    }
+
     for experiment in &study.experiments {
         for unit in &experiment.units {
             if unit.scenario != scenario.id {

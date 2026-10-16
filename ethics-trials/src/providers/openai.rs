@@ -3,7 +3,7 @@ use std::time::{Duration, Instant};
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 
-use crate::providers::types::ProviderResponse;
+use crate::providers::types::{ProviderError, ProviderResponse};
 
 const OPENROUTER_BASE_URL: &str = "https://openrouter.ai/api/v1";
 const MAX_RETRIES: usize = 5;
@@ -128,24 +128,12 @@ impl OpenAiCompatibleClient {
 
         let latency_ms = started.elapsed().as_millis();
 
-        let parsed: ChatCompletionResponse = response
-            .into_json()
-            .context("failed to parse provider response body")?;
-        let content = parsed
-            .choices
-            .first()
-            .map(|item| item.message.content.clone())
-            .unwrap_or_default();
+        let body = response.into_string().map_err(|error| ProviderError {
+            message: format!("failed to read provider response body: {error}"),
+            raw_body: None,
+        })?;
 
-        Ok(ProviderResponse {
-            content,
-            tokens_in: parsed.usage.as_ref().and_then(|item| item.prompt_tokens),
-            tokens_out: parsed
-                .usage
-                .as_ref()
-                .and_then(|item| item.completion_tokens),
-            latency_ms,
-        })
+        Ok(parse_completion_body(&body, latency_ms)?)
     }
 
     pub fn list_models(&self) -> Result<OpenRouterModelsResponse> {
@@ -191,6 +179,61 @@ impl OpenAiCompatibleClient {
     }
 }
 
+/// Parse the JSON text of a successful (HTTP 2xx) chat completion response.
+///
+/// Null/missing `message.content` is not an error: it yields `content = ""`
+/// with `content_null = true`. Parse failures carry the raw body.
+fn parse_completion_body(body: &str, latency_ms: u128) -> std::result::Result<ProviderResponse, ProviderError> {
+    let parsed: ChatCompletionResponse =
+        serde_json::from_str(body).map_err(|error| ProviderError {
+            message: format!(
+                "failed to parse provider response body: {error}: {}",
+                truncate(body, 500)
+            ),
+            raw_body: Some(body.to_owned()),
+        })?;
+
+    let choice = parsed.choices.into_iter().next().ok_or_else(|| ProviderError {
+        message: format!(
+            "provider response contained no choices: {}",
+            truncate(body, 500)
+        ),
+        raw_body: Some(body.to_owned()),
+    })?;
+
+    let content_null = choice.message.content.is_none();
+    let content = choice.message.content.unwrap_or_default();
+    let anomalous = content.is_empty() || choice.finish_reason.as_deref() != Some("stop");
+
+    Ok(ProviderResponse {
+        refusal: json_text(&choice.message.refusal),
+        reasoning: json_text(&choice.message.reasoning)
+            .or_else(|| json_text(&choice.message.reasoning_content)),
+        finish_reason: choice.finish_reason,
+        native_finish_reason: choice.native_finish_reason,
+        content_null,
+        raw_body: anomalous.then(|| body.to_owned()),
+        content,
+        tokens_in: parsed.usage.as_ref().and_then(|item| item.prompt_tokens),
+        tokens_out: parsed
+            .usage
+            .as_ref()
+            .and_then(|item| item.completion_tokens),
+        latency_ms,
+    })
+}
+
+/// Render an optional JSON field as text: null/absent/empty-string -> None,
+/// string -> itself, anything else -> its JSON text.
+fn json_text(value: &serde_json::Value) -> Option<String> {
+    match value {
+        serde_json::Value::Null => None,
+        serde_json::Value::String(text) if text.is_empty() => None,
+        serde_json::Value::String(text) => Some(text.clone()),
+        other => Some(other.to_string()),
+    }
+}
+
 fn map_ureq_error(error: ureq::Error) -> anyhow::Error {
     match error {
         ureq::Error::Status(status, response) => {
@@ -198,12 +241,16 @@ fn map_ureq_error(error: ureq::Error) -> anyhow::Error {
             let body = response
                 .into_string()
                 .unwrap_or_else(|_| "<unreadable response body>".to_owned());
-            anyhow::anyhow!(
-                "provider returned HTTP {} {}: {}",
-                status,
-                status_text,
-                truncate(&body, 500)
-            )
+            ProviderError {
+                message: format!(
+                    "provider returned HTTP {} {}: {}",
+                    status,
+                    status_text,
+                    truncate(&body, 500)
+                ),
+                raw_body: Some(body),
+            }
+            .into()
         }
         ureq::Error::Transport(transport) => {
             anyhow::anyhow!("provider transport error: {}", transport)
@@ -262,7 +309,25 @@ struct ChatCompletionResponse {
 
 #[derive(Debug, Deserialize)]
 struct ChatChoice {
-    message: ChatMessage,
+    message: ResponseMessage,
+    #[serde(default)]
+    finish_reason: Option<String>,
+    #[serde(default)]
+    native_finish_reason: Option<String>,
+}
+
+/// Response-side message. Every field is tolerant: `content` may be null or
+/// absent, and refusal/reasoning may be any JSON type.
+#[derive(Debug, Deserialize)]
+struct ResponseMessage {
+    #[serde(default)]
+    content: Option<String>,
+    #[serde(default)]
+    refusal: serde_json::Value,
+    #[serde(default)]
+    reasoning: serde_json::Value,
+    #[serde(default)]
+    reasoning_content: serde_json::Value,
 }
 
 #[derive(Debug, Deserialize)]

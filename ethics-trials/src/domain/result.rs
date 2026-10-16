@@ -25,6 +25,16 @@ pub struct TrialResult {
     pub escalation_normalized: Option<NormalizedResponse>,
     #[serde(default)]
     pub escalation_grading: Option<DeterministicGrade>,
+    /// Always-sent follow-up turn (variant `followup`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub followup_response: Option<RawModelResponse>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub followup_normalized: Option<NormalizedResponse>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub followup_grading: Option<DeterministicGrade>,
+    /// Id of the coercion variant text sent, when `coercion_variants` was used.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub coercion_variant: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -33,6 +43,9 @@ pub struct FailedTrial {
     pub model_id: String,
     pub condition_label: String,
     pub error: String,
+    /// Raw provider response body, when the error carried one.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub raw_body: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -41,6 +54,24 @@ pub struct RawModelResponse {
     pub tokens_in: Option<u32>,
     pub tokens_out: Option<u32>,
     pub latency_ms: u128,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub finish_reason: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_finish_reason: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub refusal: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reasoning: Option<String>,
+    /// True when the provider returned `message.content: null` (content is "").
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub content_null: bool,
+    /// Raw response JSON, kept only for null/empty content or finish_reason != "stop".
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub raw_body: Option<String>,
+}
+
+fn is_false(value: &bool) -> bool {
+    !*value
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -153,7 +153,15 @@ Lane A, so it can run in parallel.
     `scripts/run_drone_casualty_sweep.sh`).
   - Same scheduler flags.
   - `--judge` only where the original used it (drone).
-  - No `--temperature`: the original runs used each provider's default.
+  - No `--temperature` flag. The client then sends temperature 0.0, as it
+    did in March (corrected 2026-10-16; an earlier version of this plan
+    said "provider default").
+  - `max_tokens` is fixed at 800 in the client, as in March. Reasoning
+    models can spend the whole budget thinking and return empty
+    content. The new logging records `finish_reason`, so `length`
+    (budget exhausted) can be told apart from a content filter. Raising
+    the limit would break comparability with March; decide before
+    Lane B and record the decision here.
 - **Cohort.**
   - *Anchors:* the 17 original models that OpenRouter still serves
     (checked 2026-10-16). Rerunning the same id measures drift and

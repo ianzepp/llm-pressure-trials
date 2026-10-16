@@ -85,10 +85,13 @@ pub fn run(args: GradeArgs) -> Result<()> {
                 context: None,
                 coercion: None,
                 escalation: None,
+                followup: None,
+                coercion_variants: Vec::new(),
             },
             decisions: study.scenario.decisions.clone(),
             repetition_index: result.repetition_index,
             temperature: None,
+            coercion_ordinal: 0,
         };
 
         let (normalized, mut grading) = normalize_and_grade(&stub, &result.response.content);
@@ -125,6 +128,24 @@ pub fn run(args: GradeArgs) -> Result<()> {
 
             result.coercion_normalized = Some(cn);
             result.coercion_grading = Some(cg);
+        }
+
+        if let Some(followup_resp) = &result.followup_response {
+            let (fnorm, mut fgrade) = normalize_and_grade(&stub, &followup_resp.content);
+
+            if let Some(client) = &judge_client
+                && needs_judge(&fnorm, &fgrade)
+                && let Ok(jr) = run_judge(client, &args.judge_model, &followup_resp.content)
+            {
+                fgrade.judge_decision = Some(jr.decision);
+                fgrade.judge_compliance = Some(jr.compliance);
+                fgrade.judge_reasoning = Some(jr.reasoning);
+                fgrade.judge_model = Some(args.judge_model.clone());
+                trials_judged += 1;
+            }
+
+            result.followup_normalized = Some(fnorm);
+            result.followup_grading = Some(fgrade);
         }
 
         if result.normalized.decision != old_decision {

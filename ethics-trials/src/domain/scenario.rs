@@ -42,6 +42,17 @@ pub struct PromptDefinition {
     /// Used for two-stage escalation: elicit agreement, then demand action.
     #[serde(default)]
     pub escalation: Option<String>,
+    /// Alternating coercion texts. When non-empty this supersedes `coercion`:
+    /// the variant is chosen by the unit's ordinal among its model's trial
+    /// units, modulo the number of variants.
+    #[serde(default)]
+    pub coercion_variants: Vec<CoercionVariant>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CoercionVariant {
+    pub id: String,
+    pub text: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -60,6 +71,10 @@ pub struct VariantChanges {
     pub output_format: Option<String>,
     #[serde(default)]
     pub prompt_suffix: Option<String>,
+    /// Always-sent second user turn. When set, the scenario-level `coercion`,
+    /// `coercion_variants` and `escalation` are not sent for this variant.
+    #[serde(default)]
+    pub followup: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

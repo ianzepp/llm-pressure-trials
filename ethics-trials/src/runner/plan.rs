@@ -18,6 +18,8 @@ pub fn expand_experiment(
     let mut units = Vec::new();
 
     for model_id in models {
+        // Ordinal of each unit among this model's units, in expansion order.
+        let mut ordinal = 0usize;
         for unit in &experiment.units {
             let condition = unit
                 .condition
@@ -55,7 +57,9 @@ pub fn expand_experiment(
                     decisions: study.scenario.decisions.clone(),
                     repetition_index: rep,
                     temperature: unit.temperature,
+                    coercion_ordinal: ordinal,
                 });
+                ordinal += 1;
             }
         }
     }
@@ -88,6 +92,7 @@ pub fn expand_scenario(
             decisions: study.scenario.decisions.clone(),
             repetition_index: 0,
             temperature: None,
+            coercion_ordinal: 0,
         });
     }
 
@@ -142,6 +147,8 @@ fn resolve_prompt(
         context: scenario.prompt.context.clone(),
         coercion: scenario.prompt.coercion.clone(),
         escalation: scenario.prompt.escalation.clone(),
+        followup: variant.and_then(|item| item.changes.followup.clone()),
+        coercion_variants: scenario.prompt.coercion_variants.clone(),
     }
 }
 

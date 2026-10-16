@@ -56,6 +56,8 @@ fn fixture_study() -> LoadedStudy {
                 user: "prompt".to_owned(),
                 context: None,
                 coercion: None,
+                escalation: None,
+                coercion_variants: Vec::new(),
             },
             variants: Vec::new(),
             conditions: Vec::new(),

@@ -1,11 +1,15 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
+use rusqlite::types::Value;
 use rusqlite::{Connection, OptionalExtension, params};
 use serde::Serialize;
 
 use crate::domain::model::ModelPricing;
-use crate::domain::result::{ComparisonResult, FailedTrial, RunMetadata, RunSummary, TrialResult};
+use crate::domain::result::{
+    ComparisonResult, DeterministicGrade, FailedTrial, NormalizedResponse, RawModelResponse,
+    RunMetadata, RunSummary, TrialResult,
+};
 
 pub struct StudyDatabase {
     path: PathBuf,
@@ -75,71 +79,26 @@ impl StudyDatabase {
     }
 
     pub fn insert_trial_result(&self, run_id: &str, result: &TrialResult) -> Result<()> {
+        let columns = trial_result_columns(run_id, result)?;
+        let names: Vec<&str> = columns.iter().map(|(name, _)| name.as_str()).collect();
+        let placeholders: Vec<String> = (1..=columns.len()).map(|i| format!("?{i}")).collect();
+        let updates: Vec<String> = names
+            .iter()
+            .filter(|name| **name != "run_id" && **name != "trial_id")
+            .map(|name| format!("{name} = excluded.{name}"))
+            .collect();
+        let sql = format!(
+            "INSERT INTO trial_results ({}) VALUES ({}) \
+             ON CONFLICT(run_id, trial_id) DO UPDATE SET {}",
+            names.join(", "),
+            placeholders.join(", "),
+            updates.join(", ")
+        );
+
         let conn = self.open()?;
         conn.execute(
-            r#"
-            INSERT INTO trial_results (
-                run_id, trial_id, model_id, condition_label, output_format,
-                response_content, tokens_in, tokens_out, latency_ms,
-                normalized_json, grading_json, prompt_json, repetition_index,
-                coercion_content, coercion_normalized_json, coercion_grading_json,
-                coercion_tokens_in, coercion_tokens_out, coercion_latency_ms,
-                escalation_content, escalation_normalized_json, escalation_grading_json,
-                escalation_tokens_in, escalation_tokens_out, escalation_latency_ms
-            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13,
-                      ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22, ?23, ?24, ?25)
-            ON CONFLICT(run_id, trial_id) DO UPDATE SET
-                model_id = excluded.model_id,
-                condition_label = excluded.condition_label,
-                output_format = excluded.output_format,
-                response_content = excluded.response_content,
-                tokens_in = excluded.tokens_in,
-                tokens_out = excluded.tokens_out,
-                latency_ms = excluded.latency_ms,
-                normalized_json = excluded.normalized_json,
-                grading_json = excluded.grading_json,
-                prompt_json = excluded.prompt_json,
-                repetition_index = excluded.repetition_index,
-                coercion_content = excluded.coercion_content,
-                coercion_normalized_json = excluded.coercion_normalized_json,
-                coercion_grading_json = excluded.coercion_grading_json,
-                coercion_tokens_in = excluded.coercion_tokens_in,
-                coercion_tokens_out = excluded.coercion_tokens_out,
-                coercion_latency_ms = excluded.coercion_latency_ms,
-                escalation_content = excluded.escalation_content,
-                escalation_normalized_json = excluded.escalation_normalized_json,
-                escalation_grading_json = excluded.escalation_grading_json,
-                escalation_tokens_in = excluded.escalation_tokens_in,
-                escalation_tokens_out = excluded.escalation_tokens_out,
-                escalation_latency_ms = excluded.escalation_latency_ms
-            "#,
-            params![
-                run_id,
-                result.trial_id,
-                result.model_id,
-                result.condition_label,
-                result.output_format,
-                result.response.content,
-                result.response.tokens_in.map(i64::from),
-                result.response.tokens_out.map(i64::from),
-                to_i64(result.response.latency_ms)?,
-                serde_json::to_string(&result.normalized)?,
-                serde_json::to_string(&result.grading)?,
-                serde_json::to_string(&result.prompt)?,
-                result.repetition_index,
-                result.coercion_response.as_ref().map(|r| r.content.clone()),
-                result.coercion_normalized.as_ref().map(|n| serde_json::to_string(n)).transpose()?,
-                result.coercion_grading.as_ref().map(|g| serde_json::to_string(g)).transpose()?,
-                result.coercion_response.as_ref().and_then(|r| r.tokens_in.map(i64::from)),
-                result.coercion_response.as_ref().and_then(|r| r.tokens_out.map(i64::from)),
-                result.coercion_response.as_ref().map(|r| r.latency_ms as i64),
-                result.escalation_response.as_ref().map(|r| r.content.clone()),
-                result.escalation_normalized.as_ref().map(|n| serde_json::to_string(n)).transpose()?,
-                result.escalation_grading.as_ref().map(|g| serde_json::to_string(g)).transpose()?,
-                result.escalation_response.as_ref().and_then(|r| r.tokens_in.map(i64::from)),
-                result.escalation_response.as_ref().and_then(|r| r.tokens_out.map(i64::from)),
-                result.escalation_response.as_ref().map(|r| r.latency_ms as i64),
-            ],
+            &sql,
+            rusqlite::params_from_iter(columns.into_iter().map(|(_, value)| value)),
         )
         .context("failed to insert trial result into sqlite.db")?;
 
@@ -151,12 +110,13 @@ impl StudyDatabase {
         conn.execute(
             r#"
             INSERT INTO failed_trials (
-                run_id, trial_id, model_id, condition_label, error
-            ) VALUES (?1, ?2, ?3, ?4, ?5)
+                run_id, trial_id, model_id, condition_label, error, raw_body
+            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6)
             ON CONFLICT(run_id, trial_id) DO UPDATE SET
                 model_id = excluded.model_id,
                 condition_label = excluded.condition_label,
-                error = excluded.error
+                error = excluded.error,
+                raw_body = excluded.raw_body
             "#,
             params![
                 run_id,
@@ -164,6 +124,7 @@ impl StudyDatabase {
                 failure.model_id,
                 failure.condition_label,
                 failure.error,
+                failure.raw_body,
             ],
         )
         .context("failed to insert failed trial into sqlite.db")?;
@@ -531,6 +492,24 @@ impl StudyDatabase {
         ensure_column(&conn, "trial_results", "escalation_tokens_in", "INTEGER")?;
         ensure_column(&conn, "trial_results", "escalation_tokens_out", "INTEGER")?;
         ensure_column(&conn, "trial_results", "escalation_latency_ms", "INTEGER")?;
+        ensure_column(&conn, "trial_results", "followup_content", "TEXT")?;
+        ensure_column(&conn, "trial_results", "followup_normalized_json", "TEXT")?;
+        ensure_column(&conn, "trial_results", "followup_grading_json", "TEXT")?;
+        ensure_column(&conn, "trial_results", "followup_tokens_in", "INTEGER")?;
+        ensure_column(&conn, "trial_results", "followup_tokens_out", "INTEGER")?;
+        ensure_column(&conn, "trial_results", "followup_latency_ms", "INTEGER")?;
+        ensure_column(&conn, "trial_results", "coercion_variant", "TEXT")?;
+        for prefix in TURN_PREFIXES {
+            for (suffix, definition) in LOG_COLUMNS {
+                ensure_column(
+                    &conn,
+                    "trial_results",
+                    &format!("{prefix}{suffix}"),
+                    definition,
+                )?;
+            }
+        }
+        ensure_column(&conn, "failed_trials", "raw_body", "TEXT")?;
 
         Ok(())
     }
@@ -811,6 +790,161 @@ impl AggregateStats {
     }
 }
 
+/// Column-name prefixes of the per-turn logging columns. The first turn is
+/// unprefixed (`finish_reason`, ...); later turns are `coercion_finish_reason`, ...
+const TURN_PREFIXES: [&str; 4] = ["", "coercion_", "escalation_", "followup_"];
+
+/// Provider-response logging columns added to every turn: (suffix, definition).
+const LOG_COLUMNS: [(&str, &str); 6] = [
+    ("finish_reason", "TEXT"),
+    ("native_finish_reason", "TEXT"),
+    ("refusal_text", "TEXT"),
+    ("reasoning_text", "TEXT"),
+    ("content_null", "INTEGER"),
+    ("raw_body", "TEXT"),
+];
+
+type ColumnValues = Vec<(String, Value)>;
+
+fn opt_text(value: Option<&str>) -> Value {
+    value.map_or(Value::Null, |text| Value::Text(text.to_owned()))
+}
+
+fn opt_int(value: Option<i64>) -> Value {
+    value.map_or(Value::Null, Value::Integer)
+}
+
+fn opt_json<T: Serialize>(value: Option<&T>) -> Result<Value> {
+    Ok(match value {
+        Some(item) => Value::Text(serde_json::to_string(item)?),
+        None => Value::Null,
+    })
+}
+
+/// The six logging columns for one turn; all NULL when the turn did not occur.
+fn push_log_columns(
+    out: &mut ColumnValues,
+    prefix: &str,
+    response: Option<&RawModelResponse>,
+) {
+    let values = [
+        opt_text(response.and_then(|r| r.finish_reason.as_deref())),
+        opt_text(response.and_then(|r| r.native_finish_reason.as_deref())),
+        opt_text(response.and_then(|r| r.refusal.as_deref())),
+        opt_text(response.and_then(|r| r.reasoning.as_deref())),
+        opt_int(response.map(|r| i64::from(r.content_null))),
+        opt_text(response.and_then(|r| r.raw_body.as_deref())),
+    ];
+    for ((suffix, _), value) in LOG_COLUMNS.iter().zip(values) {
+        out.push((format!("{prefix}{suffix}"), value));
+    }
+}
+
+/// An optional later turn (`coercion_`, `escalation_`, `followup_`) as columns.
+fn push_turn_columns(
+    out: &mut ColumnValues,
+    prefix: &str,
+    response: Option<&RawModelResponse>,
+    normalized: Option<&NormalizedResponse>,
+    grading: Option<&DeterministicGrade>,
+) -> Result<()> {
+    out.push((
+        format!("{prefix}content"),
+        opt_text(response.map(|r| r.content.as_str())),
+    ));
+    out.push((format!("{prefix}normalized_json"), opt_json(normalized)?));
+    out.push((format!("{prefix}grading_json"), opt_json(grading)?));
+    out.push((
+        format!("{prefix}tokens_in"),
+        opt_int(response.and_then(|r| r.tokens_in.map(i64::from))),
+    ));
+    out.push((
+        format!("{prefix}tokens_out"),
+        opt_int(response.and_then(|r| r.tokens_out.map(i64::from))),
+    ));
+    out.push((
+        format!("{prefix}latency_ms"),
+        opt_int(response.map(|r| r.latency_ms as i64)),
+    ));
+    push_log_columns(out, prefix, response);
+    Ok(())
+}
+
+fn trial_result_columns(run_id: &str, result: &TrialResult) -> Result<ColumnValues> {
+    let mut out: ColumnValues = vec![
+        ("run_id".to_owned(), Value::Text(run_id.to_owned())),
+        ("trial_id".to_owned(), Value::Text(result.trial_id.clone())),
+        ("model_id".to_owned(), Value::Text(result.model_id.clone())),
+        (
+            "condition_label".to_owned(),
+            Value::Text(result.condition_label.clone()),
+        ),
+        (
+            "output_format".to_owned(),
+            opt_text(result.output_format.as_deref()),
+        ),
+        (
+            "response_content".to_owned(),
+            Value::Text(result.response.content.clone()),
+        ),
+        (
+            "tokens_in".to_owned(),
+            opt_int(result.response.tokens_in.map(i64::from)),
+        ),
+        (
+            "tokens_out".to_owned(),
+            opt_int(result.response.tokens_out.map(i64::from)),
+        ),
+        (
+            "latency_ms".to_owned(),
+            Value::Integer(to_i64(result.response.latency_ms)?),
+        ),
+        (
+            "normalized_json".to_owned(),
+            Value::Text(serde_json::to_string(&result.normalized)?),
+        ),
+        (
+            "grading_json".to_owned(),
+            Value::Text(serde_json::to_string(&result.grading)?),
+        ),
+        (
+            "prompt_json".to_owned(),
+            Value::Text(serde_json::to_string(&result.prompt)?),
+        ),
+        (
+            "repetition_index".to_owned(),
+            Value::Integer(i64::from(result.repetition_index)),
+        ),
+    ];
+    push_log_columns(&mut out, "", Some(&result.response));
+    push_turn_columns(
+        &mut out,
+        "coercion_",
+        result.coercion_response.as_ref(),
+        result.coercion_normalized.as_ref(),
+        result.coercion_grading.as_ref(),
+    )?;
+    push_turn_columns(
+        &mut out,
+        "escalation_",
+        result.escalation_response.as_ref(),
+        result.escalation_normalized.as_ref(),
+        result.escalation_grading.as_ref(),
+    )?;
+    push_turn_columns(
+        &mut out,
+        "followup_",
+        result.followup_response.as_ref(),
+        result.followup_normalized.as_ref(),
+        result.followup_grading.as_ref(),
+    )?;
+    out.push((
+        "coercion_variant".to_owned(),
+        opt_text(result.coercion_variant.as_deref()),
+    ));
+    Ok(out)
+}
+
 fn to_i64(value: u128) -> Result<i64> {
     i64::try_from(value).context("numeric value overflow while writing sqlite.db")
 }
@@ -892,3 +1026,7 @@ fn compute_votes(trial_rows: &[TrialReportRow], model_id: &str) -> Vec<VoteSumma
 fn to_sql_error(error: serde_json::Error) -> rusqlite::Error {
     rusqlite::Error::FromSqlConversionFailure(0, rusqlite::types::Type::Text, Box::new(error))
 }
+
+#[cfg(test)]
+#[path = "sqlite_test.rs"]
+mod tests;

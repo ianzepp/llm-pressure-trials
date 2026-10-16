@@ -106,6 +106,35 @@ fields:
         type: string
         required: false
         description: Optional shared context block.
+      coercion:
+        type: string
+        required: false
+        description: >
+          Follow-up user turn sent only when the first response is graded a
+          refusal.
+      escalation:
+        type: string
+        required: false
+        description: >
+          Follow-up user turn sent only when the first response is NOT graded a
+          refusal (two-stage escalation).
+      coercion_variants:
+        type: list[object]
+        required: false
+        description: >
+          Alternating coercion texts. When non-empty this supersedes `coercion`.
+          When coercion would fire, the variant is chosen by the trial unit's
+          ordinal position among that model's units in expansion order, modulo
+          the number of variants (two variants split a model's 24 units 12/12).
+          The chosen id is stored as `coercion_variant`. Ids must be non-empty
+          and unique. Plain text only; no templating.
+        item_fields:
+          id:
+            type: string
+            description: Stable identifier recorded with each trial.
+          text:
+            type: string
+            description: The coercion user turn text.
 
   variants:
     type: list[object]
@@ -124,6 +153,26 @@ fields:
         description: >
           Declarative patch over the base scenario. Exact merge semantics to be
           defined by the runner later.
+        fields:
+          output_format:
+            type: string
+            required: false
+          prompt_suffix:
+            type: string
+            required: false
+            description: Text appended to the base user prompt.
+          followup:
+            type: string
+            required: false
+            description: >
+              Always-sent second user turn. After the first response, the
+              runner sends this text as the next user message in the same
+              conversation (system, context, user, assistant=first response,
+              user=followup) regardless of grading, and stores the response,
+              normalized form and grade in the `followup_*` fields. When a
+              variant has `followup`, the scenario-level `coercion`,
+              `coercion_variants` and `escalation` are NOT sent for that trial.
+              Plain text only; no `{first_response}` templating.
 
   conditions:
     type: list[object]
