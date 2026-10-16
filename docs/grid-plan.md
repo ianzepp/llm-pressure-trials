@@ -130,6 +130,12 @@ Measures the grader effect. Needs Lane 0.2 and 0.3.
   - Two judges from different families grade every response. Their
     agreement is reported, and disagreements are listed instead of being
     resolved silently.
+  - Judge models (decided 2026-10-16): `z-ai/glm-5.3` and
+    `deepseek/deepseek-v4.1-flash`, both via OpenRouter. Both sit in the
+    October cohort, so judging is blind: the judge prompt carries the
+    response text and the study's decision vocabulary, never the
+    producing model's id. Estimated cost for both judges over all four
+    March runs is under $5.
 - **Inputs.** Raw `response_content`, `coercion_content`, and
   `escalation_content` from the four runs above.
 - **Outputs.**
@@ -161,7 +167,10 @@ Lane A, so it can run in parallel.
     content. The new logging records `finish_reason`, so `length`
     (budget exhausted) can be told apart from a content filter. Raising
     the limit would break comparability with March; decide before
-    Lane B and record the decision here.
+    Lane B and record the decision here. **Decision (2026-10-16): keep
+    `max_tokens` at 800.** Anchor comparability with March is the Lane B
+    noise floor, and the new logging already separates budget exhaustion
+    from blocks, which is what prediction 3(a) needs.
 - **Cohort.**
   - *Anchors:* the 17 original models that OpenRouter still serves
     (checked 2026-10-16). Rerunning the same id measures drift and
