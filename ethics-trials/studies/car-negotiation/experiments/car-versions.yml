@@ -1,0 +1,49 @@
+id: car-versions
+title: January Car Versions
+description: >
+  All four January car versions side by side, 3 repeats each. Every trial
+  sends its January follow-up turn as a second turn in the same
+  conversation, always (the January harness sent it unconditionally).
+mode: abab
+repeats: 3
+tags:
+  - trolley
+  - negotiation
+  - january-port
+
+units:
+  - label: car-a-bribe
+    scenario: car-negotiation
+    condition: car-a-bribe
+
+  - label: car-b-executive
+    scenario: car-negotiation
+    condition: car-b-executive
+
+  - label: pure-numbers
+    scenario: car-negotiation
+    condition: pure-numbers
+
+  - label: json-sensor
+    scenario: car-negotiation
+    condition: json-sensor
+
+comparisons:
+  # Driver-role comparison (bribe requested vs bribe offered)
+  - id: bribe-vs-executive
+    left: car-a-bribe
+    right: car-b-executive
+    metric: role-delta
+
+  # Format comparison (January prediction 4(c) carry-over)
+  - id: prose-vs-json
+    left: pure-numbers
+    right: json-sensor
+    metric: format-delta
+
+metadata:
+  study: car-negotiation
+  notes:
+    - 4 conditions x 3 repeats = 12 trials per model.
+    - January single-run results (one run per model, Claude-graded) are
+      historical context, not a grid cell.

@@ -1,0 +1,62 @@
+id: odds-matched
+title: Plane vs Destroyer at Matched Odds
+description: >
+  2x2 over victim identity (civilian passengers vs military crew) and odds
+  level (certain death on both paths vs 2% survival on the slow path).
+  The plane-vs-destroyer delta within an odds level isolates victim
+  identity (prediction 9); the certain-vs-2pct delta within a frame
+  measures what the January survival chance was confounding.
+mode: abab
+repeats: 3
+tags:
+  - mercy
+  - naval
+  - victims
+  - odds
+
+units:
+  - label: plane-certain
+    scenario: naval-mercy
+    condition: plane-certain
+
+  - label: plane-2pct
+    scenario: naval-mercy
+    condition: plane-2pct
+
+  - label: destroyer-certain
+    scenario: naval-mercy
+    condition: destroyer-certain
+
+  - label: destroyer-2pct
+    scenario: naval-mercy
+    condition: destroyer-2pct
+
+comparisons:
+  # Victim identity at matched odds
+  - id: plane-vs-destroyer-certain
+    left: plane-certain
+    right: destroyer-certain
+    metric: victim-delta
+
+  - id: plane-vs-destroyer-2pct
+    left: plane-2pct
+    right: destroyer-2pct
+    metric: victim-delta
+
+  # Odds level within each frame
+  - id: plane-certain-vs-2pct
+    left: plane-certain
+    right: plane-2pct
+    metric: odds-delta
+
+  - id: destroyer-certain-vs-2pct
+    left: destroyer-certain
+    right: destroyer-2pct
+    metric: odds-delta
+
+metadata:
+  study: naval-mercy
+  notes:
+    - 4 conditions x 3 repeats = 12 trials per model.
+    - January single-run results (one run per model, Claude-graded) are
+      historical context, not a grid cell.
