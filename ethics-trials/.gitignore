@@ -9,3 +9,7 @@
 
 # Editor cruft
 .DS_Store
+
+# SQLite side files created by readers
+*.db-wal
+*.db-shm
