@@ -1,0 +1,40 @@
+# Format: model_id<TAB>prompt_price_per_token<TAB>completion_price_per_token
+
+# --- March anchors (still served) ---
+meta-llama/llama-3.1-8b-instruct	0.00000005	0.00000008
+mistralai/mistral-nemo	0.000000029	0.00000003
+qwen/qwen-2.5-7b-instruct	0.0000001	0.0000002
+amazon/nova-micro-v1	0.000000035	0.00000014
+google/gemma-3-27b-it	0.00000008	0.00000045
+meta-llama/llama-3.3-70b-instruct	0.0000001	0.00000032
+qwen/qwen-2.5-72b-instruct	0.00000036	0.0000004
+microsoft/phi-4	0.00000007	0.00000014
+mistralai/mistral-small-3.2-24b-instruct	0.00000009375	0.00000025
+meta-llama/llama-4-scout	0.0000001	0.0000003
+openai/gpt-4.1-nano	0.0000001	0.0000004
+openai/gpt-4.1-mini	0.0000004	0.0000016
+google/gemini-2.5-flash-lite	0.0000001	0.0000004
+mistralai/mistral-large	0.000002	0.000006
+openai/gpt-4.1	0.000002	0.000008
+anthropic/claude-sonnet-4.6	0.000003	0.000015
+google/gemini-2.5-pro-preview	0.00000125	0.00001
+
+# --- Successors ---
+anthropic/claude-haiku-5.5	0.0000001	0.0000005
+anthropic/claude-sonnet-5.5	0.000002	0.00001
+anthropic/claude-opus-5.5	0.000004	0.00002
+openai/gpt-6.1-sol	0.000002	0.00001
+openai/gpt-6-luna-pro	0.0000001	0.0000005
+google/gemini-4-argon	0.000002	0.00001
+google/gemini-3.8-flash	0.000000825	0.000004125
+google/gemma-4-31b-it	0.0000002	0.0000004
+x-ai/grok-4.7	0.000002	0.000006
+mistralai/mistral-large-4-0	0.00000068	0.00000209
+qwen/qwen3.8-max-0902	0.000002	0.000006
+qwen/qwen3.8-flash	0.00000015	0.00000047
+liquid/lfm-2.5-24b-a2b	0.00000005	0.0000007
+
+# --- New families ---
+z-ai/glm-5.3	0.000000079	0.0000048
+z-ai/glm-5.3-flash	0.00000003114	0.0000009
+deepseek/deepseek-v4.1-flash	0.000000036	0.0000006633

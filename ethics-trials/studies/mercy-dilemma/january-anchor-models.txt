@@ -1,0 +1,13 @@
+# Format: model_id<TAB>prompt_price_per_token<TAB>completion_price_per_token
+
+# --- January anchors (still served) ---
+openai/gpt-4o	0.0000025	0.00001
+openai/gpt-4o-mini	0.00000015	0.0000006
+openai/o3-mini	0.0000011	0.0000044
+deepseek/deepseek-chat-v3.1	0.00000025	0.00000095
+deepseek/deepseek-r1-0528	0.0000005	0.00000215
+moonshotai/kimi-k2	0.00000057	0.0000023
+meta-llama/llama-3.1-70b-instruct	0.0000004	0.0000004
+meta-llama/llama-3.1-8b-instruct	0.00000005	0.00000008
+meta-llama/llama-3.2-3b-instruct	0.00000005	0.00000033
+meta-llama/llama-3.2-1b-instruct	0.000000027	0.000000201
