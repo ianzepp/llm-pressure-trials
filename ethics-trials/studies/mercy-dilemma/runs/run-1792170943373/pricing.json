@@ -1,0 +1,167 @@
+[
+  {
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "prompt_cost_per_token": 5e-08,
+    "completion_cost_per_token": 8e-08
+  },
+  {
+    "model_id": "mistralai/mistral-nemo",
+    "prompt_cost_per_token": 2.9e-08,
+    "completion_cost_per_token": 3e-08
+  },
+  {
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "prompt_cost_per_token": 1e-07,
+    "completion_cost_per_token": 2e-07
+  },
+  {
+    "model_id": "amazon/nova-micro-v1",
+    "prompt_cost_per_token": 3.5e-08,
+    "completion_cost_per_token": 1.4e-07
+  },
+  {
+    "model_id": "google/gemma-3-27b-it",
+    "prompt_cost_per_token": 8e-08,
+    "completion_cost_per_token": 4.5e-07
+  },
+  {
+    "model_id": "meta-llama/llama-3.3-70b-instruct",
+    "prompt_cost_per_token": 1e-07,
+    "completion_cost_per_token": 3.2e-07
+  },
+  {
+    "model_id": "qwen/qwen-2.5-72b-instruct",
+    "prompt_cost_per_token": 3.6e-07,
+    "completion_cost_per_token": 4e-07
+  },
+  {
+    "model_id": "microsoft/phi-4",
+    "prompt_cost_per_token": 7e-08,
+    "completion_cost_per_token": 1.4e-07
+  },
+  {
+    "model_id": "mistralai/mistral-small-3.2-24b-instruct",
+    "prompt_cost_per_token": 9.375e-08,
+    "completion_cost_per_token": 2.5e-07
+  },
+  {
+    "model_id": "meta-llama/llama-4-scout",
+    "prompt_cost_per_token": 1e-07,
+    "completion_cost_per_token": 3e-07
+  },
+  {
+    "model_id": "openai/gpt-4.1-nano",
+    "prompt_cost_per_token": 1e-07,
+    "completion_cost_per_token": 4e-07
+  },
+  {
+    "model_id": "openai/gpt-4.1-mini",
+    "prompt_cost_per_token": 4e-07,
+    "completion_cost_per_token": 1.6e-06
+  },
+  {
+    "model_id": "google/gemini-2.5-flash-lite",
+    "prompt_cost_per_token": 1e-07,
+    "completion_cost_per_token": 4e-07
+  },
+  {
+    "model_id": "mistralai/mistral-large",
+    "prompt_cost_per_token": 2e-06,
+    "completion_cost_per_token": 6e-06
+  },
+  {
+    "model_id": "openai/gpt-4.1",
+    "prompt_cost_per_token": 2e-06,
+    "completion_cost_per_token": 8e-06
+  },
+  {
+    "model_id": "anthropic/claude-sonnet-4.6",
+    "prompt_cost_per_token": 3e-06,
+    "completion_cost_per_token": 1.5e-05
+  },
+  {
+    "model_id": "google/gemini-2.5-pro-preview",
+    "prompt_cost_per_token": 1.25e-06,
+    "completion_cost_per_token": 1e-05
+  },
+  {
+    "model_id": "anthropic/claude-haiku-5.5",
+    "prompt_cost_per_token": 1e-07,
+    "completion_cost_per_token": 5e-07
+  },
+  {
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "prompt_cost_per_token": 2e-06,
+    "completion_cost_per_token": 1e-05
+  },
+  {
+    "model_id": "anthropic/claude-opus-5.5",
+    "prompt_cost_per_token": 4e-06,
+    "completion_cost_per_token": 2e-05
+  },
+  {
+    "model_id": "openai/gpt-6.1-sol",
+    "prompt_cost_per_token": 2e-06,
+    "completion_cost_per_token": 1e-05
+  },
+  {
+    "model_id": "openai/gpt-6-luna-pro",
+    "prompt_cost_per_token": 1e-07,
+    "completion_cost_per_token": 5e-07
+  },
+  {
+    "model_id": "google/gemini-4-argon",
+    "prompt_cost_per_token": 2e-06,
+    "completion_cost_per_token": 1e-05
+  },
+  {
+    "model_id": "google/gemini-3.8-flash",
+    "prompt_cost_per_token": 8.25e-07,
+    "completion_cost_per_token": 4.125e-06
+  },
+  {
+    "model_id": "google/gemma-4-31b-it",
+    "prompt_cost_per_token": 2e-07,
+    "completion_cost_per_token": 4e-07
+  },
+  {
+    "model_id": "x-ai/grok-4.7",
+    "prompt_cost_per_token": 2e-06,
+    "completion_cost_per_token": 6e-06
+  },
+  {
+    "model_id": "mistralai/mistral-large-4-0",
+    "prompt_cost_per_token": 6.8e-07,
+    "completion_cost_per_token": 2.09e-06
+  },
+  {
+    "model_id": "qwen/qwen3.8-max-0902",
+    "prompt_cost_per_token": 2e-06,
+    "completion_cost_per_token": 6e-06
+  },
+  {
+    "model_id": "qwen/qwen3.8-flash",
+    "prompt_cost_per_token": 1.5e-07,
+    "completion_cost_per_token": 4.7e-07
+  },
+  {
+    "model_id": "liquid/lfm-2.5-24b-a2b",
+    "prompt_cost_per_token": 5e-08,
+    "completion_cost_per_token": 7e-07
+  },
+  {
+    "model_id": "z-ai/glm-5.3",
+    "prompt_cost_per_token": 7.9e-08,
+    "completion_cost_per_token": 4.8e-06
+  },
+  {
+    "model_id": "z-ai/glm-5.3-flash",
+    "prompt_cost_per_token": 2.196e-08,
+    "completion_cost_per_token": 9e-07
+  },
+  {
+    "model_id": "deepseek/deepseek-v4.1-flash",
+    "prompt_cost_per_token": 3.6e-08,
+    "completion_cost_per_token": 6.633e-07
+  }
+]
