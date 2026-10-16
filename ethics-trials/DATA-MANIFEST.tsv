@@ -121,3 +121,10 @@ ethics-trials/studies/mercy-dilemma/runs/run-1792172074513/run.json	1193	2026-10
 ethics-trials/studies/mercy-dilemma/runs/run-1792172074513/summary.json	1248	2026-10-16T17:37:11Z	a355abac4ecccbe57515aef7d221a933d9313a041b233df16068bfdc085a9fcc
 ethics-trials/studies/mercy-dilemma/runs/run-1792172074513/trial_results.jsonl	1710870	2026-10-16T17:37:11Z	f15822c855d5e14597f480a1b7c204b0696382c405dad0844241aa18a4c8dea3
 ethics-trials/studies/mercy-dilemma/runs/run-1792172074513/trial_units.json	842183	2026-10-16T17:34:34Z	b52d2b3ce462a0d07a9a1e73b8cf09dae20bbc7498fcc09242d8848fac7d5007
+ethics-trials/studies/naval-mercy/sqlite.db	3907584	2026-10-16T17:44:38Z	8fbb885973f6cc8faff2debc11b7f1cf855174fe61e983d80d90fc07ef01854c
+ethics-trials/studies/naval-mercy/runs/run-1792172266428/comparisons.json	190724	2026-10-16T17:44:38Z	5b884d924cb7cddf4daecbcda7ec0e4a8f90e7ae9dd87009ab63650ef5b66146
+ethics-trials/studies/naval-mercy/runs/run-1792172266428/pricing.json	5493	2026-10-16T17:37:46Z	722c7883624d135e943f04b5f51731bf2c8baf4e4bff0deb0d3d4251348a1f73
+ethics-trials/studies/naval-mercy/runs/run-1792172266428/run.json	1509	2026-10-16T17:37:46Z	e39350dde125ddbd201e32ac2b29fcac6aef4b3bb90c1221a74c01496c2c65b3
+ethics-trials/studies/naval-mercy/runs/run-1792172266428/summary.json	1565	2026-10-16T17:44:38Z	53fb4cc3d35f0067d5b09add9d2280be38de7cebb2241c1dc1902ce8f509361a
+ethics-trials/studies/naval-mercy/runs/run-1792172266428/trial_results.jsonl	3463590	2026-10-16T17:44:38Z	c9d6e1d54f17d525f4c534096ddecd2fb7805c9ba211a90272359dbdc19db507
+ethics-trials/studies/naval-mercy/runs/run-1792172266428/trial_units.json	1068520	2026-10-16T17:37:46Z	f6b298c316cab34dfd015015e714b99e98ac476ac6e51bf2a641c3f2058c2b5c
