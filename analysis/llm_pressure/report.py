@@ -33,9 +33,11 @@ def gold_accuracy(df: pd.DataFrame, sheet: pd.DataFrame) -> tuple[pd.DataFrame, 
     been filled in yet."""
     sheet = sheet.copy()
     sheet["label_outcome"] = sheet["label_outcome"].astype(str).str.strip()
-    labeled = sheet[sheet["label_outcome"] != ""]
+    labeled = sheet[~sheet["label_outcome"].isin(("", "UNSURE"))]
+    excluded = int(len(sheet) - len(labeled))
+    note_extra = f" ({excluded} row(s) excluded: blank or UNSURE)" if excluded else ""
     if labeled.empty:
-        return pd.DataFrame(), "no non-blank label_outcome values yet"
+        return pd.DataFrame(), "no non-blank label_outcome values yet" + note_extra
     merged = labeled.merge(df, on=["run_id", "trial_id", "turn"], how="inner", suffixes=("", "_r"))
     rows = []
     gold_norm = merged["label_outcome"].str.upper()
@@ -46,6 +48,8 @@ def gold_accuracy(df: pd.DataFrame, sheet: pd.DataFrame) -> tuple[pd.DataFrame, 
         rows.append({"grader": name, "n": int(len(pred)), "correct": int((pred == gold_norm).sum()),
                      "accuracy": round(float((pred == gold_norm).mean()), 4)})
     note = None if rows else "labels present, but no grader columns to score"
+    if rows and note_extra:
+        note = note_extra.lstrip()
     return pd.DataFrame(rows), note
 
 

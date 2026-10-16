@@ -87,9 +87,26 @@ new logging separates these from content-filter blocks per turn.
 
 ## Gold accuracy
 
-Pending the operator's labels in `analysis/gold/sample.csv`
-(`label_outcome`: the study's decision values, REFUSE, BLOCKED, or
-UNCLEAR). When filled, `lp report` scores the Rust grader, the
-pre-pass, each judge, and the combined grade against those labels, and
-the winner of the extractability question above is settled. This
-section will be updated then; no number in it changes retroactively.
+The operator hand-labeled the 100-row gold sample (one row marked UNSURE
+and excluded; `label_test_aware` left unlabeled — the borderline cases
+were not confidently callable by hand, so the awareness flag stays a
+machine-only signal with no gold verification). Accuracy against the 99
+labeled rows (the sample is deliberately weighted toward hard rows):
+
+| Grader | Correct | Accuracy |
+| --- | --- | --- |
+| Rust stored grade (March) | 68/99 | 68.7% |
+| Deterministic pre-pass | 84/99 | **84.8%** |
+| Judge 1 (`z-ai/glm-5.3`) | 80/99 | 80.8% |
+| Judge 2 (`deepseek/deepseek-v4.1-flash`) | 79/99 | 79.8% |
+| Combined final grade | 71/99 | 71.7% |
+
+Three conclusions. First, the stored March grades are wrong on nearly a
+third of the hard rows; the pre-pass is the most accurate single grader
+and the March-vs-pre-pass gap on this sample is 16 points. Second, the
+extractability question resolves toward the judges being right to
+hesitate, but not as right as the pre-pass: judge disagreement
+(downgraded to UNCLEAR) costs more than the second judge adds, so the
+combined grade scores below the pre-pass alone. Third, for Lane C the
+reference grade is the pre-pass outcome, with the two judges kept as
+agreement context rather than as the deciding vote.

@@ -98,9 +98,12 @@ ROOT = load.default_root()
 @pytest.mark.skipif(not load.db_path(ROOT, "mercy-dilemma").exists(), reason="archive not present")
 def test_real_archive_row_counts():
     df = load.load_all(ROOT)
-    initial = df[df["turn"] == "initial"].groupby("study").size().to_dict()
+    # Run ids are unix-ms timestamps; everything below this boundary is the
+    # March 2026 archive. October reruns append rows to the same databases.
+    march = df[df["run_id"].str.slice(4).astype(int) < 1780000000000]
+    initial = march[march["turn"] == "initial"].groupby("study").size().to_dict()
     assert initial == {"mercy-dilemma": 1485, "drone-doctrine": 490, "simple-mercy": 20, "smoke-latency": 388}
-    assert (df["turn"] == "coercion").sum() == 195
+    assert (march["turn"] == "coercion").sum() == 195
 
 
 @pytest.mark.skipif(not load.db_path(ROOT, "mercy-dilemma").exists(), reason="archive not present")
