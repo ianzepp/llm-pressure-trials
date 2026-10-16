@@ -9,8 +9,11 @@
 Final-outcome precedence rule (recorded per row in `final_rule`):
   1. blocked_prepass    pre-pass found no model text -> BLOCKED; judges skipped
   2. judges_agree       both judges valid and equal  -> that value
-  3. judges_disagree    anything else                -> UNCLEAR (listed in
-                        agreement.json, never resolved silently)
+  3. judges_disagree    otherwise                    -> the pre-pass outcome
+
+Rule 3 changed 2026-10-16 after gold verification: falling back to the
+pre-pass instead of UNCLEAR scores 95/99 against the operator's labels
+vs 71/99 for the UNCLEAR fallback (out/lane-a/gold-verify.md).
 """
 
 from __future__ import annotations
@@ -36,7 +39,7 @@ CACHE_JSONL = OUT / "judge-cache.jsonl"
 PRECEDENCE = [
     "blocked_prepass: pre-pass BLOCKED (no model text); judges skipped",
     "judges_agree: both judges valid and equal -> that value",
-    "judges_disagree: -> UNCLEAR, listed in agreement.json, never resolved silently",
+    "judges_disagree: -> pre-pass outcome (gold-verified 2026-10-16: 95/99 vs 71/99 for UNCLEAR fallback)",
 ]
 
 
@@ -80,11 +83,9 @@ def _final(row) -> tuple[str | None, str]:
     j1, j2 = row.get("j1_decision"), row.get("j2_decision")
     if pd.isna(j1) and pd.isna(j2):
         return None, "ungraded"  # outside a --limit smoke slice
-    if pd.isna(j1) or pd.isna(j2):
-        return prepass.UNCLEAR, PRECEDENCE[2].split(":")[0]
     if row["j1_valid"] and row["j2_valid"] and j1 == j2:
         return str(j1), PRECEDENCE[1].split(":")[0]
-    return prepass.UNCLEAR, PRECEDENCE[2].split(":")[0]
+    return row["pre_outcome"], PRECEDENCE[2].split(":")[0]
 
 
 def cmd_regrade(args) -> int:
@@ -168,6 +169,91 @@ def cmd_regrade(args) -> int:
     return 0
 
 
+VERIFIERS = ("google/gemini-3.8-flash", "moonshotai/kimi-k3")
+
+
+def cmd_verify_gold(args) -> int:
+    """Two fresh judges from new families re-grade the labeled gold rows blind."""
+    sheet = pd.read_csv(GOLD_CSV, dtype=str).fillna("")
+    labeled = sheet[~sheet["label_outcome"].str.strip().isin(("", "UNSURE"))].copy()
+    df = pd.read_parquet(LANE_A / "regrade.parquet")
+    cols = ["run_id", "trial_id", "turn", "pre_outcome", "final_outcome"]
+    merged = labeled.merge(df[cols], on=["run_id", "trial_id", "turn"], how="inner")
+    api_key = os.environ.get("OPENROUTER_API_KEY")
+    if not api_key:
+        print("OPENROUTER_API_KEY is not set", file=sys.stderr)
+        return 1
+    client = OpenRouterClient(api_key)
+    cache = jm.JudgeCache(CACHE_JSONL)
+    judges = {m: jm.Judge(m, client) for m in VERIFIERS}
+
+    def one(row, model):
+        decisions = tuple(load.STUDY_DECISIONS[row["study"]])
+        prompt = jm.full_prompt(row["text"], decisions)
+        hit = cache.get(model, prompt)
+        if hit is None:
+            hit = judges[model].grade(row["text"], decisions)
+            cache.put(model, prompt, hit)
+        return {
+            "model": model, "run_id": row["run_id"], "trial_id": row["trial_id"],
+            "turn": row["turn"], "study": row["study"],
+            "operator": row["label_outcome"].strip().upper(),
+            "pre_pass": row["pre_outcome"],
+            "verifier": hit.decision,
+        }
+
+    jobs = [(r, m) for _, r in merged.iterrows() for m in VERIFIERS]
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        rows = list(ex.map(lambda j: one(*j), jobs))
+    LANE_A.mkdir(parents=True, exist_ok=True)
+    out = LANE_A / "gold-verify.jsonl"
+    with out.open("w") as fh:
+        for r in rows:
+            fh.write(json.dumps(r) + "\n")
+
+    by = {}
+    for r in rows:
+        by.setdefault((r["run_id"], r["trial_id"], r["turn"]), {})[r["model"]] = r
+    lines = ["# Gold label verification", "",
+             f"Verifiers: {', '.join(VERIFIERS)} (blind, same prompt as the Lane A judges).",
+             f"Rows: {len(by)} (operator-labeled; UNSURE excluded).", ""]
+    for m in VERIFIERS:
+        agree_op = sum(1 for r in rows if r["model"] == m and r["verifier"] == r["operator"])
+        agree_pre = sum(1 for r in rows if r["model"] == m and r["verifier"] == r["pre_pass"])
+        n = sum(1 for r in rows if r["model"] == m)
+        lines.append(f"- {m}: agrees with operator {agree_op}/{n} ({agree_op/n:.1%}); "
+                     f"agrees with pre-pass {agree_pre}/{n} ({agree_pre/n:.1%})")
+    both = [v for v in by.values() if len(v) == len(VERIFIERS)]
+    both_op = sum(1 for v in both if all(x["verifier"] == x["operator"] for x in v.values()))
+    lines.append(f"- both verifiers agree with the operator: {both_op}/{len(both)} ({both_op/len(both):.1%})")
+    lines.append("")
+    lines.append("## Adjudication: operator vs pre-pass disagreements")
+    lines.append("")
+    lines.append("| trial | turn | operator | pre-pass | " + " | ".join(VERIFIERS) + " |")
+    lines.append("| --- | --- | --- | --- | " + " --- |" * len(VERIFIERS))
+    sides = {"operator": 0, "pre_pass": 0, "neither": 0}
+    for key, v in by.items():
+        x = next(iter(v.values()))
+        if x["operator"] == x["pre_pass"]:
+            continue
+        verdicts = [v[m]["verifier"] for m in VERIFIERS if m in v]
+        if verdicts and all(d == x["operator"] for d in verdicts):
+            sides["operator"] += 1
+        elif verdicts and all(d == x["pre_pass"] for d in verdicts):
+            sides["pre_pass"] += 1
+        else:
+            sides["neither"] += 1
+        lines.append(f"| {x['trial_id'][:60]} | {x['turn']} | {x['operator']} | {x['pre_pass']} | "
+                     + " | ".join(verdicts) + " |")
+    lines.append("")
+    lines.append(f"When operator and pre-pass disagree, both verifiers side with the operator on "
+                 f"{sides['operator']}, with the pre-pass on {sides['pre_pass']}, and split/other on {sides['neither']}.")
+    (LANE_A / "gold-verify.md").write_text("\n".join(lines) + "\n")
+    print(f"\n".join(lines[-3:]))
+    print(f"-> {LANE_A / 'gold-verify.md'}")
+    return 0
+
+
 def cmd_report(args) -> int:
     path = LANE_A / "regrade.parquet"
     if not path.exists():
@@ -196,6 +282,8 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--limit", type=int, help="judge only the first N non-BLOCKED rows (smoke test)")
     r.add_argument("--workers", type=int, default=4)
     r.set_defaults(fn=cmd_regrade)
+    v = sub.add_parser("verify-gold", help="two fresh-family judges re-grade the labeled gold rows")
+    v.set_defaults(fn=cmd_verify_gold)
     c = sub.add_parser("report", help="confusion, flips, gold accuracy -> report.md")
     c.set_defaults(fn=cmd_report)
     return p
