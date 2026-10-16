@@ -1,5 +1,7 @@
 .venv/
-out/
 __pycache__/
 *.egg-info/
 .pytest_cache/
+out/*
+!out/lane-a/
+!out/judge-cache.jsonl
