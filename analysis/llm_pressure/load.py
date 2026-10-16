@@ -21,6 +21,8 @@ STUDIES = ("mercy-dilemma", "drone-doctrine", "simple-mercy", "smoke-latency")
 STUDY_DECISIONS: dict[str, tuple[str, ...]] = {
     "mercy-dilemma": ("DEPRESSURIZE", "MAINTAIN"),
     "drone-doctrine": ("AUTHORIZE", "DENY", "WAIT"),
+    "naval-mercy": ("INTERVENE", "STANDBY"),
+    "car-negotiation": ("MAINTAIN", "DITCH_RIGHT"),
     "simple-mercy": ("ACT", "REFUSE", "UNSURE"),
     "smoke-latency": ("READY",),
 }
@@ -33,6 +35,33 @@ GRID_RUNS: dict[str, tuple[str, ...]] = {
     "mercy-dilemma": ("run-1774557774975",),
     "drone-doctrine": ("run-1774562150016", "run-1774567427517", "run-1774568254306"),
 }
+
+# The thirteen October 2026 runs (Lane C input). The five retry runs re-ran
+# whole models after transient provider failures.
+OCTOBER_RUNS: dict[str, tuple[str, ...]] = {
+    "mercy-dilemma": ("run-1792170943373", "run-1792172074513", "run-1792177062846"),
+    "drone-doctrine": (
+        "run-1792172074527",
+        "run-1792173389770",
+        "run-1792174295161",
+        "run-1792174718966",
+        "run-1792175988871",
+        "run-1792176209275",
+        "run-1792176286405",
+    ),
+    "naval-mercy": ("run-1792172266428",),
+    "car-negotiation": ("run-1792172715285", "run-1792175167781"),
+}
+OCTOBER_RETRY_RUNS = frozenset(
+    {
+        "run-1792175988871",
+        "run-1792176209275",
+        "run-1792176286405",
+        "run-1792175167781",
+        "run-1792177062846",
+    }
+)
+RUNSETS = {"grid": GRID_RUNS, "october": OCTOBER_RUNS}
 _PREFIX = {"initial": "", "coercion": "coercion_", "escalation": "escalation_", "followup": "followup_"}
 _CONTENT_COL = {"initial": "response_content"}
 
@@ -210,3 +239,69 @@ def load_grid(root: Path | None = None, studies: tuple[str, ...] | None = None) 
     df = load_all(root, studies)
     mask = df.apply(lambda r: r["run_id"] in GRID_RUNS.get(r["study"], ()), axis=1)
     return df[mask].reset_index(drop=True)
+
+
+def _run_ts(run_id: str) -> int:
+    """Run ids are run-<unix ms>; the timestamp orders runs oldest to newest."""
+    return int(str(run_id).split("-", 1)[1])
+
+
+def merge_run_rows(rows: list[dict]) -> list[dict]:
+    """One trial row per trial_id for the October run set.
+
+    In-run duplicates (same run_id and trial_id) keep the first inserted row
+    (`rows` must be ordered by rowid); the naval/car runs accidentally ran
+    meta-llama/llama-3.1-8b-instruct twice. Across runs, a retried trial keeps
+    the row from the newest run that recorded a result: provider failures are
+    written to trial_failures.jsonl, never to trial_results, so the newest run
+    with a row is the newest run with a non-failure result.
+    """
+    seen: set[tuple[str, str]] = set()
+    best: dict[str, tuple[int, int, dict]] = {}
+    for order, row in enumerate(rows):
+        key = (row["run_id"], row["trial_id"])
+        if key in seen:
+            continue
+        seen.add(key)
+        current = best.get(row["trial_id"])
+        if current is None or _run_ts(row["run_id"]) > current[0]:
+            best[row["trial_id"]] = (_run_ts(row["run_id"]), order, row)
+    return [row for _, _, row in sorted(best.values(), key=lambda item: item[1])]
+
+
+def _load_runset_study(root: Path, study: str, runs: tuple[str, ...]) -> pd.DataFrame:
+    path = db_path(root, study)
+    con = connect_ro(path)
+    try:
+        con.row_factory = sqlite3.Row
+        available = {r["name"] for r in con.execute("PRAGMA table_info(trial_results)")}
+        if not available:
+            raise RuntimeError(f"{path}: no trial_results table")
+        marks = ",".join("?" * len(runs))
+        cur = con.execute(
+            f"SELECT * FROM trial_results WHERE run_id IN ({marks}) ORDER BY run_id, trial_id, rowid",
+            runs,
+        )
+        merged = merge_run_rows([dict(r) for r in cur])
+    finally:
+        con.close()
+    out: list[dict] = []
+    for row in merged:
+        out.extend(_turn_rows(study, row, available))
+    return pd.DataFrame(out, columns=COLUMNS)
+
+
+def load_runset(name: str, root: Path | None = None) -> pd.DataFrame:
+    """A named run set: 'grid' (Lane A, four March runs) or 'october' (Lane C,
+    thirteen October runs with the retry-run merge applied)."""
+    if name == "grid":
+        return load_grid(root)
+    try:
+        runset = RUNSETS[name]
+    except KeyError:
+        raise ValueError(f"unknown run set {name!r}; have {sorted(RUNSETS)}") from None
+    root = root or default_root()
+    frames = [_load_runset_study(root, study, runs) for study, runs in runset.items()]
+    df = pd.concat(frames, ignore_index=True)
+    df["repetition_index"] = df["repetition_index"].astype("int64")
+    return df

@@ -100,9 +100,10 @@ def parse_judge_output(raw: str, text: str, decisions: tuple[str, ...]) -> Judge
 class Judge:
     """One judge model. `client` is an OpenRouterClient (injectable)."""
 
-    def __init__(self, model: str, client: OpenRouterClient):
+    def __init__(self, model: str, client: OpenRouterClient, *, max_tokens: int = 300):
         self.model = model
         self._client = client
+        self._max_tokens = max_tokens
 
     def grade(self, text: str, decisions: tuple[str, ...]) -> JudgeResult:
         messages = [
@@ -110,7 +111,7 @@ class Judge:
             {"role": "user", "content": user_prompt(text, decisions)},
         ]
         try:
-            raw = self._client.chat(self.model, messages, temperature=0.0, max_tokens=300)
+            raw = self._client.chat(self.model, messages, temperature=0.0, max_tokens=self._max_tokens)
         except OpenRouterError as exc:
             return JudgeResult("UNCLEAR", False, "", False, False, str(exc), "")
         return parse_judge_output(raw, text, decisions)

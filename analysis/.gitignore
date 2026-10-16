@@ -5,3 +5,4 @@ __pycache__/
 out/*
 !out/lane-a/
 !out/judge-cache.jsonl
+!out/lane-c/
