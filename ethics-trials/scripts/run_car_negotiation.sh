@@ -32,6 +32,10 @@ while IFS=$'\t' read -r model_id _rest; do
   if [[ -z "${model_id}" || "${model_id}" == \#* ]]; then
     continue
   fi
+  if [[ " ${seen_ids[*]:-} " == *" ${model_id} "* ]]; then
+    continue
+  fi
+  seen_ids+=("${model_id}")
   model_args+=(--model "${model_id}")
 done < "${models_file_1}"
 

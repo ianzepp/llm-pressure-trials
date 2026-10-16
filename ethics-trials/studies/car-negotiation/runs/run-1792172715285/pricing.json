@@ -1,0 +1,217 @@
+[
+  {
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "prompt_cost_per_token": 5e-8,
+    "completion_cost_per_token": 8e-8
+  },
+  {
+    "model_id": "mistralai/mistral-nemo",
+    "prompt_cost_per_token": 2.9e-8,
+    "completion_cost_per_token": 3e-8
+  },
+  {
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "prompt_cost_per_token": 1e-7,
+    "completion_cost_per_token": 2e-7
+  },
+  {
+    "model_id": "amazon/nova-micro-v1",
+    "prompt_cost_per_token": 3.5e-8,
+    "completion_cost_per_token": 1.4e-7
+  },
+  {
+    "model_id": "google/gemma-3-27b-it",
+    "prompt_cost_per_token": 8e-8,
+    "completion_cost_per_token": 4.5e-7
+  },
+  {
+    "model_id": "meta-llama/llama-3.3-70b-instruct",
+    "prompt_cost_per_token": 1e-7,
+    "completion_cost_per_token": 3.2e-7
+  },
+  {
+    "model_id": "qwen/qwen-2.5-72b-instruct",
+    "prompt_cost_per_token": 3.6e-7,
+    "completion_cost_per_token": 4e-7
+  },
+  {
+    "model_id": "microsoft/phi-4",
+    "prompt_cost_per_token": 7e-8,
+    "completion_cost_per_token": 1.4e-7
+  },
+  {
+    "model_id": "mistralai/mistral-small-3.2-24b-instruct",
+    "prompt_cost_per_token": 9.375e-8,
+    "completion_cost_per_token": 2.5e-7
+  },
+  {
+    "model_id": "meta-llama/llama-4-scout",
+    "prompt_cost_per_token": 1e-7,
+    "completion_cost_per_token": 3e-7
+  },
+  {
+    "model_id": "openai/gpt-4.1-nano",
+    "prompt_cost_per_token": 1e-7,
+    "completion_cost_per_token": 4e-7
+  },
+  {
+    "model_id": "openai/gpt-4.1-mini",
+    "prompt_cost_per_token": 4e-7,
+    "completion_cost_per_token": 1.6e-6
+  },
+  {
+    "model_id": "google/gemini-2.5-flash-lite",
+    "prompt_cost_per_token": 1e-7,
+    "completion_cost_per_token": 4e-7
+  },
+  {
+    "model_id": "mistralai/mistral-large",
+    "prompt_cost_per_token": 2e-6,
+    "completion_cost_per_token": 6e-6
+  },
+  {
+    "model_id": "openai/gpt-4.1",
+    "prompt_cost_per_token": 2e-6,
+    "completion_cost_per_token": 8e-6
+  },
+  {
+    "model_id": "anthropic/claude-sonnet-4.6",
+    "prompt_cost_per_token": 3e-6,
+    "completion_cost_per_token": 0.000015
+  },
+  {
+    "model_id": "google/gemini-2.5-pro-preview",
+    "prompt_cost_per_token": 1.25e-6,
+    "completion_cost_per_token": 0.00001
+  },
+  {
+    "model_id": "anthropic/claude-haiku-5.5",
+    "prompt_cost_per_token": 1e-7,
+    "completion_cost_per_token": 5e-7
+  },
+  {
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "prompt_cost_per_token": 2e-6,
+    "completion_cost_per_token": 0.00001
+  },
+  {
+    "model_id": "anthropic/claude-opus-5.5",
+    "prompt_cost_per_token": 4e-6,
+    "completion_cost_per_token": 0.00002
+  },
+  {
+    "model_id": "openai/gpt-6.1-sol",
+    "prompt_cost_per_token": 2e-6,
+    "completion_cost_per_token": 0.00001
+  },
+  {
+    "model_id": "openai/gpt-6-luna-pro",
+    "prompt_cost_per_token": 1e-7,
+    "completion_cost_per_token": 5e-7
+  },
+  {
+    "model_id": "google/gemini-4-argon",
+    "prompt_cost_per_token": 2e-6,
+    "completion_cost_per_token": 0.00001
+  },
+  {
+    "model_id": "google/gemini-3.8-flash",
+    "prompt_cost_per_token": 8.25e-7,
+    "completion_cost_per_token": 4.125e-6
+  },
+  {
+    "model_id": "google/gemma-4-31b-it",
+    "prompt_cost_per_token": 2e-7,
+    "completion_cost_per_token": 4e-7
+  },
+  {
+    "model_id": "x-ai/grok-4.7",
+    "prompt_cost_per_token": 2e-6,
+    "completion_cost_per_token": 6e-6
+  },
+  {
+    "model_id": "mistralai/mistral-large-4-0",
+    "prompt_cost_per_token": 6.8e-7,
+    "completion_cost_per_token": 2.09e-6
+  },
+  {
+    "model_id": "qwen/qwen3.8-max-0902",
+    "prompt_cost_per_token": 2e-6,
+    "completion_cost_per_token": 6e-6
+  },
+  {
+    "model_id": "qwen/qwen3.8-flash",
+    "prompt_cost_per_token": 1.5e-7,
+    "completion_cost_per_token": 4.7e-7
+  },
+  {
+    "model_id": "liquid/lfm-2.5-24b-a2b",
+    "prompt_cost_per_token": 5e-8,
+    "completion_cost_per_token": 7e-7
+  },
+  {
+    "model_id": "z-ai/glm-5.3",
+    "prompt_cost_per_token": 7.9e-8,
+    "completion_cost_per_token": 4.8e-6
+  },
+  {
+    "model_id": "z-ai/glm-5.3-flash",
+    "prompt_cost_per_token": 2.196e-8,
+    "completion_cost_per_token": 9e-7
+  },
+  {
+    "model_id": "deepseek/deepseek-v4.1-flash",
+    "prompt_cost_per_token": 3.6e-8,
+    "completion_cost_per_token": 6.633e-7
+  },
+  {
+    "model_id": "openai/gpt-4o",
+    "prompt_cost_per_token": 2.5e-6,
+    "completion_cost_per_token": 0.00001
+  },
+  {
+    "model_id": "openai/gpt-4o-mini",
+    "prompt_cost_per_token": 1.5e-7,
+    "completion_cost_per_token": 6e-7
+  },
+  {
+    "model_id": "openai/o3-mini",
+    "prompt_cost_per_token": 1.1e-6,
+    "completion_cost_per_token": 4.4e-6
+  },
+  {
+    "model_id": "deepseek/deepseek-chat-v3.1",
+    "prompt_cost_per_token": 2.5e-7,
+    "completion_cost_per_token": 9.5e-7
+  },
+  {
+    "model_id": "deepseek/deepseek-r1-0528",
+    "prompt_cost_per_token": 5e-7,
+    "completion_cost_per_token": 2.15e-6
+  },
+  {
+    "model_id": "moonshotai/kimi-k2",
+    "prompt_cost_per_token": 5.7e-7,
+    "completion_cost_per_token": 2.3e-6
+  },
+  {
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "prompt_cost_per_token": 4e-7,
+    "completion_cost_per_token": 4e-7
+  },
+  {
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "prompt_cost_per_token": 5e-8,
+    "completion_cost_per_token": 8e-8
+  },
+  {
+    "model_id": "meta-llama/llama-3.2-3b-instruct",
+    "prompt_cost_per_token": 5e-8,
+    "completion_cost_per_token": 3.3e-7
+  },
+  {
+    "model_id": "meta-llama/llama-3.2-1b-instruct",
+    "prompt_cost_per_token": 2.7e-8,
+    "completion_cost_per_token": 2.01e-7
+  }
+]

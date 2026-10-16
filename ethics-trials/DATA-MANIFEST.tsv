@@ -135,3 +135,11 @@ ethics-trials/studies/drone-doctrine/runs/run-1792172074527/summary.json	1246	20
 ethics-trials/studies/drone-doctrine/runs/run-1792172074527/trial_failures.jsonl	13306	2026-10-16T17:45:46Z	9cd0d780816d66e25ab414ea6b9b5ee7cc6d50dbc983d660ae44a1574a3fd75b
 ethics-trials/studies/drone-doctrine/runs/run-1792172074527/trial_results.jsonl	9426438	2026-10-16T17:55:04Z	69800976f85cde5d5a741b8ad9e77a128dc3e273317717bc0156cbf6d72a88eb
 ethics-trials/studies/drone-doctrine/runs/run-1792172074527/trial_units.json	2135654	2026-10-16T17:34:34Z	c1b117709ffc71541035d7e0fbdd208bc547aeacade204b176c54a66e3b70f80
+ethics-trials/studies/car-negotiation/sqlite.db	5054464	2026-10-16T17:58:34Z	eeb7dfbe3f83a0477dcf1b051ba7c87e5cecdab834042762632eb1a0d68b80db
+ethics-trials/studies/car-negotiation/runs/run-1792172715285/comparisons.json	84916	2026-10-16T17:58:34Z	975d06945de3ac5f6463f98b68f17f4f5836525e675eb942100fa01b69f39c4c
+ethics-trials/studies/car-negotiation/runs/run-1792172715285/pricing.json	5493	2026-10-16T17:45:15Z	722c7883624d135e943f04b5f51731bf2c8baf4e4bff0deb0d3d4251348a1f73
+ethics-trials/studies/car-negotiation/runs/run-1792172715285/run.json	1513	2026-10-16T17:45:15Z	a66885b4711d28be8ad81bdd5fa74db7bad62a6d91b7a2b6694c7024a81492bb
+ethics-trials/studies/car-negotiation/runs/run-1792172715285/summary.json	1570	2026-10-16T17:58:34Z	b2b36ef432d18e6396c2bae7eaba69622fa843d1b53fb6837ab69c7d83a2680a
+ethics-trials/studies/car-negotiation/runs/run-1792172715285/trial_failures.jsonl	39146	2026-10-16T17:56:07Z	d865ce961edd7be401270b433f58334af85e8ee15eb4696e4157dc69e2cb9b63
+ethics-trials/studies/car-negotiation/runs/run-1792172715285/trial_results.jsonl	4790622	2026-10-16T17:58:34Z	86c5044567616fc9869e99e47527b0f484c7320bcba96f3d8a663625484ba163
+ethics-trials/studies/car-negotiation/runs/run-1792172715285/trial_units.json	957580	2026-10-16T17:45:15Z	0340ca1a831329c9f960bc78f9e3be0af539a63bd9a37520564b25a25936594b
