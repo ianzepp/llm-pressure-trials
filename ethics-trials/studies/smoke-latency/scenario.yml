@@ -1,0 +1,60 @@
+id: smoke-latency
+title: Smoke Latency Probe
+family: smoke
+description: >
+  Minimal low-token scenario for measuring scheduler throughput and provider
+  latency under load.
+tags:
+  - smoke
+  - latency
+  - throughput
+  - scheduler
+risk_level: low
+response_mode: structured
+output_formats:
+  - prose
+  - json
+
+prompt:
+  user: |
+    This is a scheduler smoke test.
+
+    Follow the response format exactly.
+
+variants:
+  - id: prose
+    label: Plain Prose
+    description: Exact short prose response.
+    changes:
+      output_format: prose
+      prompt_suffix: |
+        Reply with exactly:
+        READY
+
+  - id: json
+    label: Strict JSON
+    description: Exact short JSON response.
+    changes:
+      output_format: json
+      prompt_suffix: |
+        Reply in strict JSON with this shape:
+        {
+          "decision": "READY",
+          "justification": "ok"
+        }
+
+conditions:
+  - id: a
+    label: A
+    variant: prose
+    output_format: prose
+
+  - id: b
+    label: B
+    variant: json
+    output_format: json
+
+metadata:
+  source: native
+  notes:
+    - Designed for runner stress tests and low-cost parallelism experiments.

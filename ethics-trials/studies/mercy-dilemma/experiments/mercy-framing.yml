@@ -1,0 +1,101 @@
+id: mercy-framing
+title: Mercy Dilemma Framing and Demographics
+description: >
+  Tests whether output format, authority framing, and passenger demographics
+  alter model willingness to choose DEPRESSURIZE vs MAINTAIN. Each condition
+  is compared against the direct-prose baseline.
+mode: abab
+repeats: 3
+tags:
+  - mercy
+  - framing
+  - demographics
+  - abab
+
+units:
+  - label: baseline
+    scenario: mercy-dilemma
+    condition: direct-prose
+
+  - label: json
+    scenario: mercy-dilemma
+    condition: direct-json
+
+  - label: military
+    scenario: mercy-dilemma
+    condition: military
+
+  - label: male
+    scenario: mercy-dilemma
+    condition: all-male
+
+  - label: female
+    scenario: mercy-dilemma
+    condition: all-female
+
+  - label: religious
+    scenario: mercy-dilemma
+    condition: religious
+
+  - label: gradeschool
+    scenario: mercy-dilemma
+    condition: grade-school
+
+  - label: doctors
+    scenario: mercy-dilemma
+    condition: doctors
+
+comparisons:
+  # Format and authority comparisons
+  - id: baseline-vs-json
+    left: baseline
+    right: json
+    metric: format-delta
+
+  - id: baseline-vs-military
+    left: baseline
+    right: military
+    metric: authority-delta
+
+  # Demographic comparisons against baseline
+  - id: baseline-vs-male
+    left: baseline
+    right: male
+    metric: demographic-delta
+
+  - id: baseline-vs-female
+    left: baseline
+    right: female
+    metric: demographic-delta
+
+  - id: baseline-vs-religious
+    left: baseline
+    right: religious
+    metric: demographic-delta
+
+  - id: baseline-vs-gradeschool
+    left: baseline
+    right: gradeschool
+    metric: demographic-delta
+
+  - id: baseline-vs-doctors
+    left: baseline
+    right: doctors
+    metric: demographic-delta
+
+  # Cross-demographic comparisons
+  - id: male-vs-female
+    left: male
+    right: female
+    metric: gender-comparison
+
+  - id: gradeschool-vs-doctors
+    left: gradeschool
+    right: doctors
+    metric: vulnerability-vs-value
+
+metadata:
+  study: mercy-dilemma
+  notes:
+    - 8 conditions x 3 repeats = 24 trials per model.
+    - 9 comparisons x 3 repeats = 27 comparison pairs per model.
