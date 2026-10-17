@@ -22,6 +22,34 @@ re-analyzed and re-run in October 2026.
 Dates are backed by git history, data-file checksums, and session
 transcripts. See [`PROVENANCE.md`](PROVENANCE.md).
 
+## Authorship
+
+Ian Zepp led the research: the questions, the shape of the test
+framework, the scenarios and their variants, the pre-registered
+predictions, the edge cases raised along the way, and the
+hand-labeled gold set. None of the implementation code was written by
+hand. All of it was produced and managed by AI agents under that
+direction:
+
+| Period | Work | Produced by |
+| --- | --- | --- |
+| 2026-01 | January harness, task files, session reports | AI coding-agent sessions, mainly Claude Code |
+| 2026-03-26 | Rust harness, study definitions, original runs | Claude Code and Codex sessions |
+| 2026-10-16, up to `95483e2` | Repository assembly, provenance, grid plan, runner logging changes, first Python analysis package | Claude (Opus 5.5, with Sonnet sub-agents) |
+| 2026-10-16, `b1831b3` to `6a309a2` | October study definitions (including the adversarial prompt variants), cohorts and run scripts, extended analysis, all October runs, findings documents | GLM 5.3 |
+
+Claude declined to write the October adversarial prompt variants, which
+are prompts designed to press models past their safeguards on
+lethal decisions. GLM 5.3 wrote them, along with everything else in the
+October range. Session transcripts cover the January and March work
+(see [`PROVENANCE.md`](PROVENANCE.md)). Git commits in the October GLM
+range carry no AI co-author trailer; this table is the record.
+
+**Role overlap.** GLM 5.3 also served as one of the two October judges
+(the other was DeepSeek V4.1 Flash), and both models are also subjects
+in the October cohort. The hand-labeled gold set is March data, so it
+does not cover October answers from these models.
+
 ## October 2026 findings
 
 Start with [`docs/findings/overview.md`](docs/findings/overview.md) —
